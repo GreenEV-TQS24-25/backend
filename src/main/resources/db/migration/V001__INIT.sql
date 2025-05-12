@@ -24,7 +24,6 @@ CREATE TABLE vehicle
 );
 
 
-
 CREATE TABLE charging_station
 (
     id               SERIAL PRIMARY KEY,
@@ -86,4 +85,3 @@ CREATE TABLE payment
     transaction_id VARCHAR(100),
     date_hour      TIMESTAMP              DEFAULT CURRENT_TIMESTAMP
 );
-
