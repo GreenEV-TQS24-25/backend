@@ -1,5 +1,5 @@
 CREATE TYPE ROLE AS ENUM ( 'USER', 'OPERATOR');
-CREATE TYPE CONNECTOR_TYPE AS ENUM ( 'TYPE_1', 'TYPE_2', 'TYPE_3', 'TYPE_4', 'TYPE_5');
+CREATE TYPE CONNECTOR_TYPE AS ENUM ( 'SAEJ1772', 'MENNEKES', 'CHADEMO', 'CCS');
 CREATE TYPE SPOT_STATE AS ENUM ( 'OCCUPIED', 'FREE', 'OUT_OF_SERVICE');
 CREATE TYPE PAYMENT_STATE AS ENUM ( 'PENDING', 'COMPLETED', 'FAILED');
 CREATE TYPE SONIC AS ENUM ( 'NORMAL', 'FAST', 'FASTPP'); -- speed charging
@@ -23,7 +23,6 @@ CREATE TABLE vehicle
     connector_type CONNECTOR_TYPE     NOT NULL
 );
 
-
 CREATE TABLE charging_station
 (
     id               SERIAL PRIMARY KEY,
@@ -35,44 +34,27 @@ CREATE TABLE charging_station
     photo_url        VARCHAR(255)
 );
 
-CREATE TABLE price
-(
-    id                  SERIAL PRIMARY KEY,
-    connector_type      CONNECTOR_TYPE NOT NULL,
-    charging_velocity   SONIC          NOT NULL,
-    price_per_kwh       DECIMAL(8, 2)  NOT NULL,
-    charging_station_id INTEGER REFERENCES charging_station (id)
-);
-
 CREATE TABLE charging_spot
 (
     id                SERIAL PRIMARY KEY,
     station_id        INTEGER REFERENCES charging_station (id),
     charging_velocity SONIC          NOT NULL,
     connector_type    CONNECTOR_TYPE NOT NULL,
-    energy_kwh        DECIMAL(7, 2)  NOT NULL,
+    power_kw          DECIMAL(7, 2)  NOT NULL,
+    price_per_kwh     DECIMAL(8, 2)  NOT NULL,
     state             SPOT_STATE     NOT NULL DEFAULT 'FREE'
-);
-
-CREATE TABLE reservation
-(
-    id               SERIAL PRIMARY KEY,
-    user_id          INTEGER REFERENCES user_table (id),
-    vehicle_id       INTEGER REFERENCES vehicle (id),
-    charging_spot_id INTEGER REFERENCES charging_spot (id),
-    start_time       TIMESTAMP NOT NULL,
-    end_time         TIMESTAMP NOT NULL,
-    uuid             UUID      NOT NULL DEFAULT gen_random_uuid()
 );
 
 CREATE TABLE session
 (
-    id             SERIAL PRIMARY KEY,
-    reservation_id INTEGER REFERENCES reservation (id),
-    start_time     TIMESTAMP NOT NULL,
-    end_time       TIMESTAMP,
-    energy_kwh     DECIMAL(7, 3),
-    total_cost     DECIMAL(8, 2) DEFAULT 0.00
+    id               SERIAL PRIMARY KEY,
+    uuid             UUID      NOT NULL DEFAULT gen_random_uuid(),
+    user_id          INTEGER REFERENCES user_table (id),
+    vehicle_id       INTEGER REFERENCES vehicle (id),
+    charging_spot_id INTEGER REFERENCES charging_spot (id),
+    start_time       TIMESTAMP NOT NULL,
+    end_time         TIMESTAMP,
+    total_cost       DECIMAL(8, 2)      DEFAULT 0.00
 );
 
 CREATE TABLE payment
