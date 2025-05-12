@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 
@@ -13,7 +14,7 @@ import java.math.BigDecimal;
 @Table(name = "charging_spot")
 public class ChargingSpot {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ColumnDefault("nextval('charging_spot_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -22,8 +23,12 @@ public class ChargingSpot {
     private ChargingStation station;
 
     @NotNull
-    @Column(name = "energy_kwh", nullable = false, precision = 7, scale = 2)
-    private BigDecimal energyKwh;
+    @Column(name = "power_kw", nullable = false, precision = 7, scale = 2)
+    private BigDecimal powerKw;
+
+    @NotNull
+    @Column(name = "price_per_kwh", nullable = false, precision = 8, scale = 2)
+    private BigDecimal pricePerKwh;
 
 /*
  TODO [Reverse Engineering] create field to map the 'charging_velocity' column

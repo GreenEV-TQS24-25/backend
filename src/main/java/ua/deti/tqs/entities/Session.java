@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,13 +16,26 @@ import java.time.Instant;
 @Table(name = "session")
 public class Session {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ColumnDefault("nextval('session_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @NotNull
+    @ColumnDefault("gen_random_uuid()")
+    @Column(name = "uuid", nullable = false)
+    private UUID uuid;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservation;
+    @JoinColumn(name = "user_id")
+    private UserTable user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charging_spot_id")
+    private ChargingSpot chargingSpot;
 
     @NotNull
     @Column(name = "start_time", nullable = false)
@@ -29,9 +43,6 @@ public class Session {
 
     @Column(name = "end_time")
     private Instant endTime;
-
-    @Column(name = "energy_kwh", precision = 7, scale = 3)
-    private BigDecimal energyKwh;
 
     @ColumnDefault("0.00")
     @Column(name = "total_cost", precision = 8, scale = 2)
