@@ -1,5 +1,7 @@
 name: Lint Java code
-on: push
+on:
+  push:
+  pull_request:
 jobs:
   formatting:
     runs-on: ubuntu-latest
