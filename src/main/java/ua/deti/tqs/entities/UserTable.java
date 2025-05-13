@@ -25,7 +25,7 @@ public class UserTable {
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Size(max = 255)
