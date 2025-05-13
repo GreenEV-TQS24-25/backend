@@ -38,6 +38,7 @@ public class Vehicle {
     @Column(name = "license_plate", nullable = false, length = 20, unique = true)
     private String licensePlate;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
     private ConnectorType connectorType;
