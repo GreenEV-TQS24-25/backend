@@ -35,7 +35,7 @@ public class Vehicle {
 
     @Size(max = 20)
     @NotNull
-    @Column(name = "license_plate", nullable = false, length = 20)
+    @Column(name = "license_plate", nullable = false, length = 20, unique = true)
     private String licensePlate;
 
     @Enumerated(EnumType.STRING)
