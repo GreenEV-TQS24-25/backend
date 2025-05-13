@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import ua.deti.tqs.entities.types.PaymentState;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -40,11 +41,9 @@ public class Payment {
     @Column(name = "date_hour")
     private Instant dateHour;
 
-/*
- TODO [Reverse Engineering] create field to map the 'state' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    @Enumerated(EnumType.STRING)
     @ColumnDefault("'PENDING'")
     @Column(name = "state", columnDefinition = "payment_state not null")
-    private Object state;
-*/
+    private PaymentState state;
+
 }

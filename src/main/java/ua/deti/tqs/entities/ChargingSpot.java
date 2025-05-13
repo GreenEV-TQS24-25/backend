@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import ua.deti.tqs.entities.types.ConnectorType;
+import ua.deti.tqs.entities.types.Sonic;
+import ua.deti.tqs.entities.types.SpotState;
 
 import java.math.BigDecimal;
 
@@ -30,23 +33,17 @@ public class ChargingSpot {
     @Column(name = "price_per_kwh", nullable = false, precision = 8, scale = 2)
     private BigDecimal pricePerKwh;
 
-/*
- TODO [Reverse Engineering] create field to map the 'charging_velocity' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    @Enumerated(EnumType.STRING)
     @Column(name = "charging_velocity", columnDefinition = "sonic not null")
-    private Object chargingVelocity;
-*/
-/*
- TODO [Reverse Engineering] create field to map the 'connector_type' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    private Sonic chargingVelocity;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
-    private Object connectorType;
-*/
-/*
- TODO [Reverse Engineering] create field to map the 'state' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    private ConnectorType connectorType;
+
+    @Enumerated(EnumType.STRING)
     @ColumnDefault("'FREE'")
     @Column(name = "state", columnDefinition = "spot_state not null")
-    private Object state;
-*/
+    private SpotState state;
+
 }

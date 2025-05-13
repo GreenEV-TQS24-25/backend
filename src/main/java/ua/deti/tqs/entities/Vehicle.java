@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import ua.deti.tqs.entities.types.ConnectorType;
 
 @Getter
 @Setter
@@ -36,10 +37,8 @@ public class Vehicle {
     @Column(name = "license_plate", nullable = false, length = 20)
     private String licensePlate;
 
-/*
- TODO [Reverse Engineering] create field to map the 'connector_type' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    @Enumerated(EnumType.STRING)
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
-    private Object connectorType;
-*/
+    private ConnectorType connectorType;
+
 }

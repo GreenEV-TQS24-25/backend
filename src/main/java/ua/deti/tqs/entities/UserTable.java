@@ -1,14 +1,12 @@
 package ua.deti.tqs.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import ua.deti.tqs.entities.types.Role;
 
 @Getter
 @Setter
@@ -35,10 +33,8 @@ public class UserTable {
     @Column(name = "password", nullable = false)
     private String password;
 
-/*
- TODO [Reverse Engineering] create field to map the 'role' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", columnDefinition = "role not null")
-    private Object role;
-*/
+    private Role role;
+
 }
