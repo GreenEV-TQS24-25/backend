@@ -14,7 +14,8 @@ import ua.deti.tqs.entities.types.ConnectorType;
 @Table(name = "vehicle")
 public class Vehicle {
     @Id
-    @ColumnDefault("nextval('vehicle_id_seq')")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vehicle_id_seq")
+    @SequenceGenerator(name = "vehicle_id_seq", sequenceName = "vehicle_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Integer id;
 
