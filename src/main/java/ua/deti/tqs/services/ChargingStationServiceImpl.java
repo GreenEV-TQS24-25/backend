@@ -12,6 +12,8 @@ import ua.deti.tqs.services.interfaces.ChargingStationService;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.System.exit;
+
 @Slf4j
 @Service
 @AllArgsConstructor
