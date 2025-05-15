@@ -21,7 +21,6 @@ public class Session {
     private Integer id;
 
     @NotNull
-    @ColumnDefault("gen_random_uuid()")
     @Column(name = "uuid", nullable = false)
     private String uuid;
 
