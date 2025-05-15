@@ -48,7 +48,7 @@ CREATE TABLE charging_spot
 CREATE TABLE session
 (
     id               SERIAL PRIMARY KEY,
-    uuid             UUID      NOT NULL DEFAULT gen_random_uuid(),
+    uuid             VARCHAR(255)      NOT NULL,
     user_id          INTEGER REFERENCES user_table (id),
     vehicle_id       INTEGER REFERENCES vehicle (id),
     charging_spot_id INTEGER REFERENCES charging_spot (id),
@@ -61,7 +61,7 @@ CREATE TABLE payment
 (
     id             SERIAL PRIMARY KEY,
     session_id     INTEGER REFERENCES session (id),
-    value          DECIMAL(8, 2) NOT NULL,
+    price          DECIMAL(8, 2) NOT NULL,
     method         VARCHAR(30)   NOT NULL,
     state          PAYMENT_STATE NOT NULL DEFAULT 'PENDING',
     transaction_id VARCHAR(100),

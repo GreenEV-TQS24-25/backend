@@ -21,9 +21,8 @@ public class Session {
     private Integer id;
 
     @NotNull
-    @ColumnDefault("gen_random_uuid()")
     @Column(name = "uuid", nullable = false)
-    private UUID uuid;
+    private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -47,5 +46,11 @@ public class Session {
     @ColumnDefault("0.00")
     @Column(name = "total_cost", precision = 8, scale = 2)
     private BigDecimal totalCost;
+
+
+    @PrePersist
+    public void generateTokenAndTimestamp() {
+        this.uuid = UUID.randomUUID().toString();
+    }
 
 }

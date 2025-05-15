@@ -26,8 +26,8 @@ public class Payment {
     private Session session;
 
     @NotNull
-    @Column(name = "value", nullable = false, precision = 8, scale = 2)
-    private BigDecimal value;
+    @Column(name = "price", nullable = false, precision = 8, scale = 2)
+    private BigDecimal price;
 
     @Size(max = 30)
     @NotNull
