@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import ua.deti.tqs.entities.types.ConnectorType;
 
 @Getter
@@ -40,8 +39,7 @@ public class Vehicle {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'SAEJ1772'")
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
-    private ConnectorType connectorType;
+    private ConnectorType connectorType = ConnectorType.SAEJ1772;
 
 }
