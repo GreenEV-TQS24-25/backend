@@ -19,3 +19,6 @@ buildNumber.properties
 
 # logs
 logs/
+
+# IntelliJ IDEA
+.idea/
