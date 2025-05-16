@@ -54,7 +54,7 @@ CREATE TABLE session
     charging_spot_id INTEGER REFERENCES charging_spot (id),
     start_time       TIMESTAMP NOT NULL,
     end_time         TIMESTAMP,
-    total_cost       DECIMAL(8, 2)      DEFAULT 0.00
+    total_cost       DECIMAL(8, 2)
 );
 
 CREATE TABLE payment
