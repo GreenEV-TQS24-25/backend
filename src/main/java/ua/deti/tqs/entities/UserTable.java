@@ -34,6 +34,7 @@ public class UserTable {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("'USER'")
     @Column(name = "role", columnDefinition = "role not null")
     private Role role;
 

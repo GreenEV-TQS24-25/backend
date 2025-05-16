@@ -34,10 +34,12 @@ public class ChargingSpot {
     private BigDecimal pricePerKwh;
 
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("'NORMAL'")
     @Column(name = "charging_velocity", columnDefinition = "sonic not null")
     private Sonic chargingVelocity;
 
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("'SAEJ1772'")
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
     private ConnectorType connectorType;
 
