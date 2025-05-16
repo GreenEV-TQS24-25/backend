@@ -48,20 +48,17 @@ public class UserTableServiceImpl implements UserTableService {
             errorCount++;
         }
 
-        if (user.getRole() == null) {
-            log.debug("Invalid user role");
-            errorCount++;
-        }
-
         if (errorCount > 0)
             return null;
-
 
         newUser.setName(user.getName());
         newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
-        newUser.setRole(user.getRole());
 
+
+        if (user.getRole() != null)
+            newUser.setRole(user.getRole());
+        
         log.debug("User created successfully with id {}", newUser.getId());
         return userTableRepository.save(newUser);
     }
