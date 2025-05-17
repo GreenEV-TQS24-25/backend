@@ -39,6 +39,28 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     public List<ChargingStation> getAllChargingStations() {
         return chargingStationRepository.findAll();
     }
+
+    @Override
+    public List<ChargingStation> getFilteredChargingStations(List<Integer> operatorIds){
+        log.debug("Fetching all charging stations with the selected filters");
+        List<ChargingStation> chargingStations = chargingStationRepository.findAll();
+        List<ChargingStation> filteredChargingStations = Collections.emptyList();
+        for (ChargingStation chargingStation : chargingStations) {
+            for (int operatorId : operatorIds) {
+                if (operatorId == chargingStation.getOperator().getId()){
+                    filteredChargingStations.add(chargingStation);
+                    break;
+                }
+            }
+        }
+        if (filteredChargingStations.size() == 0){
+            log.debug("No charging stations found with the selected filters");
+            return filteredChargingStations;
+        }
+        log.debug("Found {} charging stations with the selected filters", filteredChargingStations.size());
+        return filteredChargingStations;
+    }
+
     @Override
     public ChargingStation createChargingStation(ChargingStation chargingStation) {
         log.debug("Creating new charging station {}", chargingStation);

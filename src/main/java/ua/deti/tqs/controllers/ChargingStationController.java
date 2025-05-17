@@ -57,6 +57,23 @@ public class ChargingStationController {
         return new ResponseEntity<>(chargingStation, HttpStatus.OK );
     }
 
+    @GetMapping("filtered")
+    @Operation(summary = "Get all Charging Stations filtered by Operator", description = "Fetches a list of all chargingStation matching at least one of the selected filters")
+    @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "No chargingStation found")
+    public ResponseEntity<List<ChargingStation>> getFilteredChargingStations(@RequestParam List<Integer> operatorIds){
+        log.info("Fetching all charging stations with the selected filters");
+
+        List<ChargingStation> chargingStation = chargingStationService.getFilteredChargingStations(operatorIds);
+
+        if (chargingStation.isEmpty()){
+            log.warn("No charging stations found with the selected filters");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        log.info("Charging stations retrieved successfully for the selected filters");
+        return new ResponseEntity<List<ChargingStation>>(chargingStation, HttpStatus.OK);
+    }
+
     @PostMapping()
     @Operation(summary = "Create a new Charging Station", description = "Creates a new chargingStation.")
     @ApiResponse(responseCode = "201", description = "ChargingStation created successfully")

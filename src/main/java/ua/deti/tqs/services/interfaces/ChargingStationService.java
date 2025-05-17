@@ -9,6 +9,8 @@ public interface ChargingStationService {
 
     List<ChargingStation> getAllChargingStations();
 
+    List<ChargingStation> getFilteredChargingStations(List<Integer> operatorIds);
+
     ChargingStation createChargingStation(ChargingStation chargingStation);
 
     ChargingStation updateChargingStation(int operatorId, ChargingStation chargingStation);
