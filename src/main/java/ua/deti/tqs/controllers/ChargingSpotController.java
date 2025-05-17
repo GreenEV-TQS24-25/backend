@@ -36,7 +36,7 @@ public class ChargingSpotController {
                log.warn("No chargingSpot found with station id {}", stationId);
                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
           }
-          log.info("ChargingSpots retrieved successfully for operator id {}", stationId);
+          log.info("ChargingSpots retrieved successfully for station id {}", stationId);
           return new ResponseEntity<>(chargingSpot, HttpStatus.OK );
      }
 
