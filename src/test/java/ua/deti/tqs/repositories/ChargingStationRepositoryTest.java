@@ -25,8 +25,6 @@ class ChargingStationRepositoryTest {
     @Autowired
     private ChargingStationRepository chargingStationRepository;
 
-    private ChargingStation chargingStation1;
-
     private UserTable operator1;
 
     @BeforeEach
@@ -42,7 +40,7 @@ class ChargingStationRepositoryTest {
         operator1.setRole(Role.OPERATOR);
         entityManager.persist(operator1);
 
-        chargingStation1 = new ChargingStation();
+        ChargingStation chargingStation1 = new ChargingStation();
         chargingStation1.setId(1);
         chargingStation1.setName("Charging Station 1");
         chargingStation1.setLat(BigDecimal.valueOf(40.7128));
