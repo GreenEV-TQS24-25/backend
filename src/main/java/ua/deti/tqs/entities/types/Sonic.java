@@ -5,4 +5,4 @@ public enum Sonic {
     FAST,
     FASTPP
 
-}
+}// gotta go fast
