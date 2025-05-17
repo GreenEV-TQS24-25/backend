@@ -35,6 +35,7 @@ public class UserTable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", columnDefinition = "role not null")
-    private Role role;
+    private Role role = Role.USER;
+
 
 }

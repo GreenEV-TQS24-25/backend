@@ -40,6 +40,6 @@ public class Vehicle {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
-    private ConnectorType connectorType;
+    private ConnectorType connectorType = ConnectorType.SAEJ1772;
 
 }
