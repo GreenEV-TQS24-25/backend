@@ -2,7 +2,7 @@ package ua.deti.tqs.services.interfaces;
 
 import ua.deti.tqs.entities.UserTable;
 
-public interface UserTableService {
+public interface UserTableService   {
     UserTable getUserById(int id);
 
     UserTable createUser(UserTable user);
