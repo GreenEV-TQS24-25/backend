@@ -89,6 +89,24 @@ class UserTableServiceTest {
     }
 
     @Test
+    void whenCreateUser_withPartialData_thenReturnUser() {
+        UserTable toCreate = new UserTable();
+        toCreate.setName("User 1");
+        toCreate.setEmail("Email 1");
+        toCreate.setPassword("Password 1");
+        toCreate.setRole(null);
+        when(userTableRepository.save(any())).thenReturn(userTable);
+
+        UserTable created = userTableService.createUser(toCreate);
+
+        assertThat(created).isNotNull();
+        assertThat(created.getName()).isEqualTo("User 1");
+        assertThat(created.getEmail()).isEqualTo("Email 1");
+        assertThat(created.getPassword()).isEqualTo("Password 1");
+        assertThat(created.getRole()).isEqualTo(Role.USER);
+    }
+
+    @Test
     void whenCreateUser_withInvalidData_thenReturnNull() {
         UserTable created = userTableService.createUser(userTableInvalid);
 

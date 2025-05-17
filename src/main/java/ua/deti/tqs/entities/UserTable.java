@@ -41,7 +41,8 @@ public class UserTable implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", columnDefinition = "role not null")
-    private Role role;
+    private Role role = Role.USER;
+
 
     @Override
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

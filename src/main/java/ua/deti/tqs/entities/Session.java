@@ -43,7 +43,6 @@ public class Session {
     @Column(name = "end_time")
     private Instant endTime;
 
-    @ColumnDefault("0.00")
     @Column(name = "total_cost", precision = 8, scale = 2)
     private BigDecimal totalCost;
 
