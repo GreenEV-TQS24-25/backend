@@ -87,7 +87,7 @@ public class ChargingSpotServiceImpl implements ChargingSpotService {
             newChargingSpot.setChargingVelocity(chargingSpot.getChargingVelocity());
 
         log.debug("Saving new charging spot {}", newChargingSpot);
-        return chargingSpotRepository.save(chargingSpot);
+        return chargingSpotRepository.save(newChargingSpot);
     }
 
     @Override
