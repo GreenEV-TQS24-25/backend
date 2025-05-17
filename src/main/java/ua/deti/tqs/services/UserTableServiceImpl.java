@@ -58,7 +58,7 @@ public class UserTableServiceImpl implements UserTableService {
 
         if (user.getRole() != null)
             newUser.setRole(user.getRole());
-        
+
         log.debug("User created successfully with id {}", newUser.getId());
         return userTableRepository.save(newUser);
     }
