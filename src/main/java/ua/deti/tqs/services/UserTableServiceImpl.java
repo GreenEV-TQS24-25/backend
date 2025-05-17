@@ -2,6 +2,7 @@ package ua.deti.tqs.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ua.deti.tqs.entities.UserTable;
 import ua.deti.tqs.repositories.UserTableRepository;

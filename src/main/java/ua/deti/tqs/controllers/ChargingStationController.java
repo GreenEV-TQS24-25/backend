@@ -16,13 +16,16 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(Constants.API_V1 + "charging-stations")
+@RequestMapping(Constants.API_V1)
 @Tag(name = "Charging Stations", description = "The Charging Stations API")
 @AllArgsConstructor
 public class ChargingStationController {
     private final ChargingStationService chargingStationService;
+    private static final String PUB_BASE_PATH = "public/charging-stations";
+    private static final String PRIV_BASE_PATH = "private/charging-stations";
 
-    @GetMapping("all")
+
+    @GetMapping(PUB_BASE_PATH + "/all")
     @Operation(summary = "Get all Charging Stations", description = "Fetches a list of all chargingStation.")
     @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
     @ApiResponse(responseCode = "404", description = "No chargingStation found")
@@ -37,10 +40,10 @@ public class ChargingStationController {
 
         }
         log.info("ChargingStations retrieved successfully");
-        return new ResponseEntity<>(chargingStation, HttpStatus.OK );
+        return new ResponseEntity<>(chargingStation, HttpStatus.OK);
     }
 
-    @GetMapping("all/{operatorId}")
+    @GetMapping(PUB_BASE_PATH + "/all/{operatorId}")
     @Operation(summary = "Get all Charging Stations by Operator ID", description = "Fetches a list of all chargingStation by operator id.")
     @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
     @ApiResponse(responseCode = "404", description = "No chargingStation found")
@@ -54,7 +57,7 @@ public class ChargingStationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.info("ChargingStations retrieved successfully for operator id {}", operatorId);
-        return new ResponseEntity<>(chargingStation, HttpStatus.OK );
+        return new ResponseEntity<>(chargingStation, HttpStatus.OK);
     }
 
     @PostMapping()
@@ -74,7 +77,7 @@ public class ChargingStationController {
         return new ResponseEntity<>(newChargingStation, HttpStatus.CREATED);
     }
 
-    @PutMapping("{operatorId}")
+    @PutMapping(PRIV_BASE_PATH + "{operatorId}") // TODO Refactor this to use the context
     @Operation(summary = "Update a Charging Station", description = "Updates a chargingStation.")
     @ApiResponse(responseCode = "200", description = "ChargingStation updated successfully")
     @ApiResponse(responseCode = "400", description = "Invalid chargingStation data")
@@ -91,7 +94,7 @@ public class ChargingStationController {
         return new ResponseEntity<>(updatedChargingStation, HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}/{operatorId}")
+    @DeleteMapping(PRIV_BASE_PATH + "{id}/{operatorId}") // TODO Refactor this to use the context
     @Operation(summary = "Delete a Charging Station", description = "Deletes a chargingStation.")
     @ApiResponse(responseCode = "200", description = "ChargingStation deleted successfully")
     @ApiResponse(responseCode = "404", description = "ChargingStation not found")

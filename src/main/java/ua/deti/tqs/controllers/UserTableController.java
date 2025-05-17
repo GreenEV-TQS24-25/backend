@@ -21,6 +21,8 @@ public class UserTableController {
     private final UserTableService userTableService;
 
 
+
+
     @GetMapping("{userId}")
     @Operation(summary = "Get User by id", description = "Fetches a user by id.")
     @ApiResponse(responseCode = "200", description = "User retrieved successfully")
@@ -55,7 +57,7 @@ public class UserTableController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
-    @PutMapping("{userId}")
+    @PutMapping("private/{userId}") // TODO Refactor this to use the context
     @Operation(summary = "Update User", description = "Updates a user.")
     @ApiResponse(responseCode = "200", description = "User updated successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
@@ -72,7 +74,7 @@ public class UserTableController {
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-    @DeleteMapping("{userId}")
+    @DeleteMapping("private/{userId}") // TODO Refactor this to use the context
     @Operation(summary = "Delete User", description = "Deletes a user.")
     @ApiResponse(responseCode = "200", description = "User deleted successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
