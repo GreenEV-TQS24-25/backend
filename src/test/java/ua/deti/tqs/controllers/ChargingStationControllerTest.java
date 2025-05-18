@@ -82,16 +82,6 @@ class ChargingStationControllerTest {
 
     testStations = Arrays.asList(testStation, testStation2);
 
-    //    when(userService.createUser(any(User.class))).thenReturn(operator);
-    //    when(userService.loginUser(any()))
-    //        .thenReturn(
-    //            new LoginResponse(
-    //                operator.getId(),
-    //                operator.getName(),
-    //                operator.getEmail(),
-    //                operator.getRole(),
-    //                "112",
-    //                112L));
     securityUtils = mockStatic(SecurityUtils.class);
     securityUtils.when(SecurityUtils::getAuthenticatedUser).thenReturn(operator);
   }

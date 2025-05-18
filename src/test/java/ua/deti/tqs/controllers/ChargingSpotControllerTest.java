@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -14,8 +15,10 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,10 +53,9 @@ class ChargingSpotControllerTest {
 
   @MockitoBean private UserService userService;
 
-  @MockitoBean private SecurityUtils securityUtils;
-
   @MockitoBean private AuthTokenFilter authTokenFilter;
 
+  @MockitoBean private MockedStatic<SecurityUtils> securityUtils;
   private ChargingSpot testSpot;
 
   private ChargingSpot testSpot2;
@@ -99,6 +101,14 @@ class ChargingSpotControllerTest {
     testSpot2.setState(SpotState.OCCUPIED);
 
     testSpots = Arrays.asList(testSpot, testSpot2);
+
+    securityUtils = mockStatic(SecurityUtils.class);
+    securityUtils.when(SecurityUtils::getAuthenticatedUser).thenReturn(testOperator);
+  }
+
+  @AfterEach
+  void tearDown() {
+    securityUtils.close();
   }
 
   @Test
@@ -205,12 +215,11 @@ class ChargingSpotControllerTest {
 
   @Test
   void whenDeleteChargingSpot_withValidIds_thenReturnOk() throws Exception {
-    Mockito.when(chargingSpotService.deleteChargingSpot(testSpot.getId(), testOperator.getId()))
-        .thenReturn(true);
+    Mockito.when(chargingSpotService.deleteChargingSpot(anyInt(), anyInt())).thenReturn(true);
 
     mockMvc
         .perform(
-            delete("/" + Constants.API_V1 + "private/charging-spots", testSpot.getId())
+            delete("/" + Constants.API_V1 + "private/charging-spots/" + testSpot.getId())
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
   }
@@ -224,7 +233,7 @@ class ChargingSpotControllerTest {
 
     mockMvc
         .perform(
-            delete("/" + Constants.API_V1 + "private/charging-spots", invalidId)
+            delete("/" + Constants.API_V1 + "private/charging-spots/" + invalidId)
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
