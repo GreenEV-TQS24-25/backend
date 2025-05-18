@@ -9,7 +9,6 @@ import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -53,12 +52,7 @@ public class AuthConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.GET, "/api/v1/private/**")
-                    .authenticated()
-                    .requestMatchers(HttpMethod.POST, "/api/v1/private/**")
-                    .authenticated()
-                    .anyRequest()
-                    .permitAll())
+                auth.requestMatchers("/api/v1/private/**").authenticated().anyRequest().permitAll())
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(authenticationJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
