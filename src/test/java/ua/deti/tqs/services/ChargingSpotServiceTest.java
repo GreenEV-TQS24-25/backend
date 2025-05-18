@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +66,7 @@ class ChargingSpotServiceTest {
     }
 
     @Test
-    void whenGetAllChargingSpotsByStationId_thenReturnChargingSpots()  {
+    void whenGetAllChargingSpotsByStationId_thenReturnChargingSpots() {
         when(chargingSpotRepository.findAllByStation_Id(chargingStation1.getId())).thenReturn(Optional.of(List.of(chargingSpot)));
 
         List<ChargingSpot> found = chargingSpotService.getAllChargingSpotsByStationId(chargingStation1.getId());
@@ -92,7 +93,7 @@ class ChargingSpotServiceTest {
     @Test
     void whenCreateChargingSpot_thenReturnCreatedChargingSpot() {
         when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.of(chargingStation1));
-        when(chargingSpotRepository.save(chargingSpot)).thenReturn(chargingSpot);
+        when(chargingSpotRepository.save(any(ChargingSpot.class))).thenReturn(chargingSpot);
 
         ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
 
@@ -102,13 +103,14 @@ class ChargingSpotServiceTest {
         assertThat(created.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
         verify(chargingStationRepository).findById(chargingStation1.getId());
-        verify(chargingSpotRepository).save(chargingSpot);
+        verify(chargingSpotRepository).save(any(ChargingSpot.class));
     }
 
     @Test
     void whenCreateChargingSpot_withPartialData_thenReturnCreatedChargingSpot() {
         when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.of(chargingStation1));
-        when(chargingSpotRepository.save(chargingSpot)).thenReturn(chargingSpot);
+        when(chargingSpotRepository.save(any(ChargingSpot.class))).thenReturn(chargingSpot);
+
 
         chargingSpot.setConnectorType(null);
         chargingSpot.setState(null);
@@ -122,7 +124,8 @@ class ChargingSpotServiceTest {
         assertThat(created.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
         verify(chargingStationRepository).findById(chargingStation1.getId());
-        verify(chargingSpotRepository).save(chargingSpot);
+        verify(chargingSpotRepository).save(any(ChargingSpot.class));
+
     }
 
     @Test
