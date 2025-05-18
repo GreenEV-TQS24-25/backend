@@ -220,27 +220,21 @@ class UserServiceTest {
 
     @Test
     void whenLoginUser_withValidCredentials_thenReturnLoginResponse() {
-        // Configurar o mock para getUserByEmail
         when(userRepository.findByEmail("Email 1")).thenReturn(Optional.of(user));
 
-        // Configurar o mock do Authentication
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(user);
 
-        // Configurar o mock do AuthenticationManager
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
 
-        // Configurar o mock do JwtUtils
         String mockToken = "mock-jwt-token";
         when(jwtUtils.generateJwtToken(authentication)).thenReturn(mockToken);
         Date expirationDate = new Date(System.currentTimeMillis() + 3600000); // 1 hora no futuro
         when(jwtUtils.getExpirationFromJwtToken(mockToken)).thenReturn(expirationDate);
 
-        // Executar o método a ser testado
         LoginResponse response = userTableService.loginUser(loginRequest);
 
-        // Verificar o resultado
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1);
         assertThat(response.getName()).isEqualTo("User 1");
@@ -249,7 +243,6 @@ class UserServiceTest {
         assertThat(response.getToken()).isEqualTo(mockToken);
         assertThat(response.getExpires()).isEqualTo(expirationDate.getTime());
 
-        // Verificar as chamadas de método
         verify(userRepository).findByEmail("Email 1");
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtUtils).generateJwtToken(authentication);
@@ -258,16 +251,12 @@ class UserServiceTest {
 
     @Test
     void whenLoginUser_withNonExistentUser_thenReturnNull() {
-        // Configurar o mock para getUserByEmail retornar null
         when(userRepository.findByEmail("Email 1")).thenReturn(Optional.empty());
 
-        // Executar o método a ser testado
         LoginResponse response = userTableService.loginUser(loginRequest);
 
-        // Verificar o resultado
         assertThat(response).isNull();
 
-        // Verificar que apenas getUserByEmail foi chamado, e não os outros métodos
         verify(userRepository).findByEmail("Email 1");
         verifyNoInteractions(authenticationManager);
         verifyNoInteractions(jwtUtils);
@@ -275,23 +264,18 @@ class UserServiceTest {
 
     @Test
     void whenLoginUser_withAuthenticationException_thenHandleException() {
-        // Configurar o mock para getUserByEmail
         when(userRepository.findByEmail("Email 1")).thenReturn(Optional.of(user));
 
-        // Configurar o AuthenticationManager para lançar uma exceção
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new RuntimeException("Authentication failed"));
 
-        // Executar o método e verificar que a exceção é propagada
         try {
             userTableService.loginUser(loginRequest);
-            // Se não lançar exceção, falha no teste
             org.junit.jupiter.api.Assertions.fail("Expected exception was not thrown");
         } catch (RuntimeException e) {
             assertThat(e.getMessage()).isEqualTo("Authentication failed");
         }
 
-        // Verificar as chamadas de método
         verify(userRepository).findByEmail("Email 1");
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verifyNoInteractions(jwtUtils);

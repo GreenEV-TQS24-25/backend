@@ -544,7 +544,6 @@ class ChargingStationServiceTest {
 
     @Test
     void whenUpdateChargingStation_withNonExistentId_thenReturnNull() {
-        // Configurar uma estação de carregamento para atualização
         ChargingStation stationToUpdate = new ChargingStation();
         stationToUpdate.setId(999); // ID que não existe
         stationToUpdate.setName("Non-existent Station");
@@ -555,16 +554,12 @@ class ChargingStationServiceTest {
         when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
         when(chargingStationRepository.findById(999)).thenReturn(Optional.empty());
 
-        // Executar o método a ser testado
         ChargingStation result = chargingStationService.updateChargingStation(1, stationToUpdate);
 
-        // Verificar que o resultado é nulo
         assertThat(result).isNull();
 
-        // Verificar que o método findById foi chamado com o ID correto
         verify(chargingStationRepository).findById(999);
 
-        // Verificar que o método save não foi chamado (já que a estação não foi encontrada)
         verify(chargingStationRepository, never()).save(any(ChargingStation.class));
     }
 
