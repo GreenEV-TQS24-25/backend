@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingStationRepository;
-import ua.deti.tqs.repositories.UserTableRepository;
+import ua.deti.tqs.repositories.UserRepository;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
 
 import java.util.Collections;
@@ -17,12 +17,17 @@ import java.util.List;
 @AllArgsConstructor
 public class ChargingStationServiceImpl implements ChargingStationService {
     private final ChargingStationRepository chargingStationRepository;
-    private final UserTableRepository userTableRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId) {
+        // need to grant that the operator is an operator
+        if (!isOperator(operatorId)) {
+            log.debug("The user with id {} is not an operator", operatorId);
+            return Collections.emptyList();
+        }
         log.debug("Fetching all charging stations with operator id {}", operatorId);
-        List<ChargingStation>  chargingStations = chargingStationRepository
+        List<ChargingStation> chargingStations = chargingStationRepository
                 .findAllByOperator_Id(operatorId)
                 .orElse(null);
 
@@ -39,8 +44,15 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     public List<ChargingStation> getAllChargingStations() {
         return chargingStationRepository.findAll();
     }
+
     @Override
-    public ChargingStation createChargingStation(ChargingStation chargingStation) {
+    public ChargingStation createChargingStation(ChargingStation chargingStation, int operatorId) {
+        // need to grant that the operator is an operator
+        if (!isOperator(operatorId)) {
+            log.debug("The user with id {} is not an operator", operatorId);
+            return null;
+        }
+
         log.debug("Creating new charging station {}", chargingStation);
 
         ChargingStation newChargingStation = new ChargingStation();
@@ -59,13 +71,16 @@ public class ChargingStationServiceImpl implements ChargingStationService {
         if (chargingStation.getOperator() == null) {
             log.debug("Invalid charging station operator, operator is null");
             errorCount++;
-        } else if (userTableRepository.findById(chargingStation.getOperator().getId()).isEmpty()) {
+        } else if (userRepository.findById(chargingStation.getOperator().getId()).isEmpty()) {
             log.debug("Invalid charging station operator id, operator not found");
             errorCount++;
         } else if (chargingStation.getOperator().getRole() != Role.OPERATOR) {
-             log.debug("Invalid charging station operator, not an operator");
-             errorCount++;
-         }
+            log.debug("Invalid charging station operator, not an operator");
+            errorCount++;
+        } else if (chargingStation.getOperator().getId() != operatorId) {
+            log.debug("Invalid charging station operator id, operator id {} does not match the authenticated user id {}", chargingStation.getOperator().getId(), operatorId);
+            errorCount++;
+        }
 
         if (errorCount > 0)
             return null;
@@ -87,6 +102,12 @@ public class ChargingStationServiceImpl implements ChargingStationService {
 
     @Override
     public ChargingStation updateChargingStation(int operatorId, ChargingStation chargingStation) {
+
+        // need to grant that the operator is an operator
+        if (!isOperator(operatorId)) {
+            log.debug("The user with id {} is not an operator", operatorId);
+            return null;
+        }
         log.debug("Updating charging station {}", chargingStation);
         ChargingStation existingChargingStation = chargingStationRepository.findById(chargingStation.getId()).orElse(null);
 
@@ -137,5 +158,13 @@ public class ChargingStationServiceImpl implements ChargingStationService {
         log.debug("Charging station with id {} deleted", id);
         chargingStationRepository.delete(chargingStation);
         return true;
+    }
+
+
+    private boolean isOperator(int id) {
+        log.debug("Checking if user with id {} is an operator", id);
+        return userRepository.findById(id)
+                .map(user -> user.getRole() == Role.OPERATOR)
+                .orElse(false);
     }
 }

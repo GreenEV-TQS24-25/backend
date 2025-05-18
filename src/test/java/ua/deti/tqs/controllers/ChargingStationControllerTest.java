@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
 import ua.deti.tqs.utils.Constants;
 
@@ -48,7 +48,7 @@ class ChargingStationControllerTest {
 
     @BeforeEach
     void setUp() {
-        UserTable operator = new UserTable();
+        User operator = new User();
         operator.setId(1);
 
         testStation = new ChargingStation();
@@ -74,7 +74,7 @@ class ChargingStationControllerTest {
     void whenGetAllChargingStations_thenReturnAllStations() throws Exception {
         when(chargingStationService.getAllChargingStations()).thenReturn(testStations);
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "charging-stations/all")
+        mockMvc.perform(get(STR."/\{Constants.API_V1}public/charging-stations/all")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -85,7 +85,7 @@ class ChargingStationControllerTest {
     void whenGetAllChargingStations_thenReturnEmptyList() throws Exception {
         when(chargingStationService.getAllChargingStations()).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "charging-stations/all")
+        mockMvc.perform(get(STR."/\{Constants.API_V1}public/charging-stations/all")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -95,7 +95,7 @@ class ChargingStationControllerTest {
         int operatorId = 1;
         when(chargingStationService.getAllChargingStationsByOperatorId(operatorId)).thenReturn(testStations);
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "charging-stations/all/" + operatorId)
+        mockMvc.perform(get(STR."/\{Constants.API_V1}private/charging-stations/")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -107,16 +107,16 @@ class ChargingStationControllerTest {
         int operatorId = 99;
         when(chargingStationService.getAllChargingStationsByOperatorId(operatorId)).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "charging-stations/all/" + operatorId)
+        mockMvc.perform(get(STR."/\{Constants.API_V1}private/charging-stations")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void whenCreateChargingStation_thenReturnCreatedStation() throws Exception {
-        when(chargingStationService.createChargingStation(any(ChargingStation.class))).thenReturn(testStation);
+        when(chargingStationService.createChargingStation(any(ChargingStation.class), 0)).thenReturn(testStation); // TODO VI MUDA ISTO
 
-        mockMvc.perform(post("/" + Constants.API_V1 + "charging-stations")
+        mockMvc.perform(post(STR."/\{Constants.API_V1}private/charging-stations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testStation)))
                 .andExpect(status().isCreated())
@@ -125,12 +125,12 @@ class ChargingStationControllerTest {
 
     @Test
     void whenCreateInvalidChargingStation_thenReturnBadRequest() throws Exception {
-        when(chargingStationService.createChargingStation(any(ChargingStation.class))).thenReturn(null);
+        when(chargingStationService.createChargingStation(any(ChargingStation.class), 0)).thenReturn(null); // TODO VI MUDA ISTO
 
         ChargingStation invalidStation = new ChargingStation();
         invalidStation.setName(""); // Invalid name
 
-        mockMvc.perform(post("/" + Constants.API_V1 + "charging-stations")
+        mockMvc.perform(post(STR."/\{Constants.API_V1}public/charging-stations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidStation)))
                 .andExpect(status().isBadRequest());
@@ -141,7 +141,7 @@ class ChargingStationControllerTest {
         int operatorId = 1;
         when(chargingStationService.updateChargingStation(eq(operatorId), any(ChargingStation.class))).thenReturn(testStation);
 
-        mockMvc.perform(put("/" + Constants.API_V1 + "charging-stations/" + operatorId)
+        mockMvc.perform(put(STR."/\{Constants.API_V1}public/charging-stations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testStation)))
                 .andExpect(status().isOk())
@@ -156,7 +156,7 @@ class ChargingStationControllerTest {
         ChargingStation invalidStation = new ChargingStation();
         invalidStation.setName(""); // Invalid name
 
-        mockMvc.perform(put("/" + Constants.API_V1 + "charging-stations/" + operatorId)
+        mockMvc.perform(put(STR."/\{Constants.API_V1}private/charging-stations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidStation)))
                 .andExpect(status().isBadRequest());
@@ -168,7 +168,7 @@ class ChargingStationControllerTest {
         int operatorId = 1;
         when(chargingStationService.deleteChargingStation(stationId, operatorId)).thenReturn(true);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "charging-stations/" + stationId + "/" + operatorId)
+        mockMvc.perform(delete(STR."/\{Constants.API_V1}private/charging-stations/\{stationId}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -179,7 +179,7 @@ class ChargingStationControllerTest {
         int operatorId = 99;
         when(chargingStationService.deleteChargingStation(stationId, operatorId)).thenReturn(false);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "charging-stations/" + stationId + "/" + operatorId)
+        mockMvc.perform(delete(STR."/\{Constants.API_V1}private/charging-stations/\{stationId}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

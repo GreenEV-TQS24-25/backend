@@ -13,7 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.entities.types.Sonic;
@@ -53,11 +53,11 @@ class ChargingSpotControllerTest {
 
     private List<ChargingSpot> testSpots;
     private ChargingStation testStation;
-    private UserTable testOperator;
+    private User testOperator;
 
     @BeforeEach
     void setUp() {
-        testOperator = new UserTable();
+        testOperator = new User();
         testOperator.setId(1);
         testOperator.setName("Test Operator");
         testOperator.setEmail("operator@test.com");
@@ -99,7 +99,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.getAllChargingSpotsByStationId(testStation.getId()))
                 .thenReturn(testSpots);
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "charging-spots/{stationId}", testStation.getId())
+        mockMvc.perform(get(STR."/\{Constants.API_V1}public/charging-spots/{stationId}", testStation.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -114,7 +114,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.getAllChargingSpotsByStationId(invalidStationId))
                 .thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "charging-spots/{stationId}", invalidStationId)
+        mockMvc.perform(get(STR."/\{Constants.API_V1}public/charging-spots/{stationId}", invalidStationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -124,7 +124,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.createChargingSpot(anyInt(), any(ChargingSpot.class)))
                 .thenReturn(testSpot);
 
-        mockMvc.perform(post("/" + Constants.API_V1 + "charging-spots/{operatorId}", testOperator.getId())
+        mockMvc.perform(post(STR."/\{Constants.API_V1}private/charging-spots", testOperator.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testSpot)))
                 .andExpect(status().isOk())
@@ -139,7 +139,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.createChargingSpot(invalidOperatorId, testSpot))
                 .thenReturn(null);
 
-        mockMvc.perform(post("/" + Constants.API_V1 + "charging-spots/{operatorId}", invalidOperatorId)
+        mockMvc.perform(post(STR."/\{Constants.API_V1}private/charging-spots", invalidOperatorId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testSpot)))
                 .andExpect(status().isNotFound());
@@ -154,7 +154,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.updateChargingSpot(anyInt(), any(ChargingSpot.class)))
                 .thenReturn(updatedSpot);
 
-        mockMvc.perform(put("/" + Constants.API_V1 + "charging-spots/{operatorId}", testOperator.getId())
+        mockMvc.perform(put(STR."/\{Constants.API_V1}private/charging-spots", testOperator.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedSpot)))
                 .andExpect(status().isOk())
@@ -168,7 +168,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.updateChargingSpot(invalidOperatorId, testSpot))
                 .thenReturn(null);
 
-        mockMvc.perform(put("/" + Constants.API_V1 + "charging-spots/{operatorId}", invalidOperatorId)
+        mockMvc.perform(put(STR."/\{Constants.API_V1}private/charging-spots", invalidOperatorId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testSpot)))
                 .andExpect(status().isNotFound());
@@ -179,7 +179,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.deleteChargingSpot(testSpot.getId(), testOperator.getId()))
                 .thenReturn(true);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "charging-spots/{id}/{operatorId}",
+        mockMvc.perform(delete(STR."/\{Constants.API_V1}private/charging-spots/{id}",
                         testSpot.getId(), testOperator.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -192,7 +192,7 @@ class ChargingSpotControllerTest {
         Mockito.when(chargingSpotService.deleteChargingSpot(invalidId, invalidOperatorId))
                 .thenReturn(false);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "charging-spots/{id}/{operatorId}",
+        mockMvc.perform(delete(STR."/\{Constants.API_V1}private/charging-spots/{id}",
                         invalidId, invalidOperatorId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());

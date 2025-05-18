@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,10 +24,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ua.deti.tqs.components.AuthEntryPointJwt;
 import ua.deti.tqs.components.AuthTokenFilter;
-import ua.deti.tqs.entities.types.Role;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.services.CustomUserDetailsService;
-import ua.deti.tqs.services.interfaces.UserTableService;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -70,7 +67,7 @@ public class AuthConfig {
     }
 
     private boolean checkUserId(Supplier<Authentication> authentication, String id) {
-        return ((UserTable) authentication.get().getPrincipal()).getId().equals(Integer.parseInt(id));
+        return ((User) authentication.get().getPrincipal()).getId().equals(Integer.parseInt(id));
     }
 
     private SecurityScheme createAPIKeyScheme() {

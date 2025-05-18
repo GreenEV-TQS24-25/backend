@@ -6,21 +6,25 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ua.deti.tqs.entities.types.Role;
+
 import java.util.Collection;
 import java.util.List;
+
 
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "user_table")
-public class UserTable implements UserDetails {
+public class User implements UserDetails {
     @Id
-    @ColumnDefault("nextval('user_table_id_seq')")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_table_seq")
+    @SequenceGenerator(name = "user_table_seq", sequenceName = "user_table_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -40,7 +44,7 @@ public class UserTable implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", columnDefinition = "role not null")
+    @Column(name = "role")
     private Role role = Role.USER;
 
 

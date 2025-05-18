@@ -5,16 +5,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.deti.tqs.repositories.UserTableRepository;
+import ua.deti.tqs.repositories.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserTableRepository userTableRepository;
+    private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String name) {
-        return userTableRepository.findByName(name).orElseThrow(() -> new UsernameNotFoundException("User não encontrado: " + name));
+    public UserDetails loadUserByUsername(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User não encontrado: " + email));
     }
 }

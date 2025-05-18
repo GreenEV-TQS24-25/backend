@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -35,7 +35,7 @@ public class JwtUtils {
     }
 
     public String generateJwtToken(Authentication authentication) {
-        UserTable userPrincipal = (UserTable) authentication.getPrincipal();
+        User userPrincipal = (User) authentication.getPrincipal();
 
         return Jwts.builder()
                 .subject(userPrincipal.getEmail())

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
 import ua.deti.tqs.utils.Constants;
+import static ua.deti.tqs.utils.SecurityUtils.getAuthenticatedUser;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ChargingStationController {
     private final ChargingStationService chargingStationService;
+
     private static final String PUB_BASE_PATH = "public/charging-stations";
     private static final String PRIV_BASE_PATH = "private/charging-stations";
 
@@ -43,11 +45,12 @@ public class ChargingStationController {
         return new ResponseEntity<>(chargingStation, HttpStatus.OK);
     }
 
-    @GetMapping(PUB_BASE_PATH + "/all/{operatorId}")
+    @GetMapping(PRIV_BASE_PATH)
     @Operation(summary = "Get all Charging Stations by Operator ID", description = "Fetches a list of all chargingStation by operator id.")
     @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
     @ApiResponse(responseCode = "404", description = "No chargingStation found")
-    public ResponseEntity<List<ChargingStation>> getAllChargingStationsByOperatorId(@PathVariable("operatorId") int operatorId) {
+    public ResponseEntity<List<ChargingStation>> getAllChargingStationsByOperatorId() {
+        int operatorId = getAuthenticatedUser().getId();
         log.info("Fetching all chargingStation with operator id {}", operatorId);
 
         List<ChargingStation> chargingStation = chargingStationService.getAllChargingStationsByOperatorId(operatorId);
@@ -60,14 +63,14 @@ public class ChargingStationController {
         return new ResponseEntity<>(chargingStation, HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping(PUB_BASE_PATH)
     @Operation(summary = "Create a new Charging Station", description = "Creates a new chargingStation.")
     @ApiResponse(responseCode = "201", description = "ChargingStation created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid chargingStation data")
     public ResponseEntity<ChargingStation> createChargingStation(@RequestBody ChargingStation chargingStation) {
         log.info("Creating new chargingStation {}", chargingStation);
 
-        ChargingStation newChargingStation = chargingStationService.createChargingStation(chargingStation);
+        ChargingStation newChargingStation = chargingStationService.createChargingStation(chargingStation, getAuthenticatedUser().getId());
 
         if (newChargingStation == null) {
             log.warn("Invalid chargingStation data");
@@ -77,14 +80,14 @@ public class ChargingStationController {
         return new ResponseEntity<>(newChargingStation, HttpStatus.CREATED);
     }
 
-    @PutMapping(PRIV_BASE_PATH + "{operatorId}") // TODO Refactor this to use the context
+    @PutMapping(PRIV_BASE_PATH)
     @Operation(summary = "Update a Charging Station", description = "Updates a chargingStation.")
     @ApiResponse(responseCode = "200", description = "ChargingStation updated successfully")
     @ApiResponse(responseCode = "400", description = "Invalid chargingStation data")
-    public ResponseEntity<ChargingStation> updateChargingStation(@PathVariable("operatorId") int operatorId, @RequestBody ChargingStation chargingStation) {
+    public ResponseEntity<ChargingStation> updateChargingStation(@RequestBody ChargingStation chargingStation) {
         log.info("Updating chargingStation {}", chargingStation);
 
-        ChargingStation updatedChargingStation = chargingStationService.updateChargingStation(operatorId, chargingStation);
+        ChargingStation updatedChargingStation = chargingStationService.updateChargingStation(getAuthenticatedUser().getId(), chargingStation);
 
         if (updatedChargingStation == null) {
             log.warn("Invalid chargingStation");
@@ -94,11 +97,12 @@ public class ChargingStationController {
         return new ResponseEntity<>(updatedChargingStation, HttpStatus.OK);
     }
 
-    @DeleteMapping(PRIV_BASE_PATH + "{id}/{operatorId}") // TODO Refactor this to use the context
+    @DeleteMapping(PRIV_BASE_PATH + "{id}")
     @Operation(summary = "Delete a Charging Station", description = "Deletes a chargingStation.")
     @ApiResponse(responseCode = "200", description = "ChargingStation deleted successfully")
     @ApiResponse(responseCode = "404", description = "ChargingStation not found")
-    public ResponseEntity<Void> deleteChargingStation(@PathVariable("id") int id, @PathVariable("operatorId") int operatorId) {
+    public ResponseEntity<Void> deleteChargingStation(@PathVariable("id") int id) {
+        int operatorId = getAuthenticatedUser().getId();
         log.info("Deleting chargingStation with id {} and operator id {}", id, operatorId);
 
         if (chargingStationService.deleteChargingStation(id, operatorId)) {

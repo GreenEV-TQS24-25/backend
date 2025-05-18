@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
@@ -40,7 +40,7 @@ class ChargingSpotServiceTest {
 
     private ChargingSpot chargingSpot;
 
-    private UserTable operator1;
+    private User operator1;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +52,7 @@ class ChargingSpotServiceTest {
         chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
         chargingStation1.setLastMaintenance(LocalDate.parse("2023-01-01"));
 
-        operator1 = new UserTable();
+        operator1 = new User();
         operator1.setId(1);
         operator1.setRole(Role.OPERATOR);
         chargingStation1.setOperator(operator1);
@@ -227,7 +227,7 @@ class ChargingSpotServiceTest {
         when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
 
         chargingSpot.setStation(new ChargingStation());
-        chargingSpot.getStation().setOperator(new UserTable());
+        chargingSpot.getStation().setOperator(new User());
         chargingSpot.getStation().getOperator().setId(999);
 
         ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), chargingSpot);
@@ -265,7 +265,7 @@ class ChargingSpotServiceTest {
         when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
 
         chargingSpot.setStation(new ChargingStation());
-        chargingSpot.getStation().setOperator(new UserTable());
+        chargingSpot.getStation().setOperator(new User());
         chargingSpot.getStation().getOperator().setId(999);
 
         boolean deleted = chargingSpotService.deleteChargingSpot(chargingSpot.getId(), operator1.getId());
