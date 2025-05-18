@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -24,11 +23,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ua.deti.tqs.components.AuthEntryPointJwt;
 import ua.deti.tqs.components.AuthTokenFilter;
-import ua.deti.tqs.entities.User;
 import ua.deti.tqs.services.CustomUserDetailsService;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 @Configuration
 @EnableWebSecurity
@@ -65,10 +62,6 @@ public class AuthConfig {
 
         return http.build();
     }
-
-//    private boolean checkUserId(Supplier<Authentication> authentication, String id) {
-//        return ((User) authentication.get().getPrincipal()).getId().equals(Integer.parseInt(id));
-//    }
 
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
