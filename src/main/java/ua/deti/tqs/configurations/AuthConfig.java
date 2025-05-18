@@ -66,9 +66,9 @@ public class AuthConfig {
         return http.build();
     }
 
-    private boolean checkUserId(Supplier<Authentication> authentication, String id) {
-        return ((User) authentication.get().getPrincipal()).getId().equals(Integer.parseInt(id));
-    }
+//    private boolean checkUserId(Supplier<Authentication> authentication, String id) {
+//        return ((User) authentication.get().getPrincipal()).getId().equals(Integer.parseInt(id));
+//    }
 
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)

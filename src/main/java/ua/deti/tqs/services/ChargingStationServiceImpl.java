@@ -18,12 +18,14 @@ import java.util.List;
 public class ChargingStationServiceImpl implements ChargingStationService {
     private final ChargingStationRepository chargingStationRepository;
     private final UserRepository userRepository;
+    private static final String USER_NOT_OPERATOR_MESSAGE = "The user with id {} is not an operator";
+
 
     @Override
     public List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId) {
         // need to grant that the operator is an operator
         if (!isOperator(operatorId)) {
-            log.debug("The user with id {} is not an operator", operatorId);
+            logInvalidOperator(operatorId);
             return Collections.emptyList();
         }
         log.debug("Fetching all charging stations with operator id {}", operatorId);
@@ -49,7 +51,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     public ChargingStation createChargingStation(ChargingStation chargingStation, int operatorId) {
         // need to grant that the operator is an operator
         if (!isOperator(operatorId)) {
-            log.debug("The user with id {} is not an operator", operatorId);
+            logInvalidOperator(operatorId);
             return null;
         }
 
@@ -105,7 +107,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
 
         // need to grant that the operator is an operator
         if (!isOperator(operatorId)) {
-            log.debug("The user with id {} is not an operator", operatorId);
+            logInvalidOperator(operatorId);
             return null;
         }
         log.debug("Updating charging station {}", chargingStation);
@@ -166,5 +168,9 @@ public class ChargingStationServiceImpl implements ChargingStationService {
         return userRepository.findById(id)
                 .map(user -> user.getRole() == Role.OPERATOR)
                 .orElse(false);
+    }
+
+    private void logInvalidOperator(int operatorId) {
+        logInvalidOperator(operatorId);
     }
 }
