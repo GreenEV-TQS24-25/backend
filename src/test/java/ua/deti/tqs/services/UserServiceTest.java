@@ -7,18 +7,26 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import ua.deti.tqs.components.JwtUtils;
+import ua.deti.tqs.dto.LoginRequest;
+import ua.deti.tqs.dto.LoginResponse;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.UserRepository;
 
+import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +35,13 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+    @Mock
+    private JwtUtils jwtUtils;
 
     @InjectMocks
     private UserServiceImpl userTableService;
@@ -36,6 +50,9 @@ class UserServiceTest {
     private User userInvalid;
 
     private User userNull;
+
+    private LoginRequest loginRequest;
+
 
     @BeforeEach
     void setUp() {
@@ -59,6 +76,14 @@ class UserServiceTest {
         userNull.setEmail(null);
         userNull.setPassword(null);
         userNull.setRole(null);
+
+        loginRequest = new LoginRequest();
+        loginRequest.setEmail("Email 1");
+        loginRequest.setPassword("Password 1");
+
+        // Limpar o contexto de segurança antes de cada teste
+        SecurityContextHolder.clearContext();
+
     }
 
     @Test
@@ -192,4 +217,84 @@ class UserServiceTest {
 
         assertThat(deleted).isFalse();
     }
+
+    @Test
+    void whenLoginUser_withValidCredentials_thenReturnLoginResponse() {
+        // Configurar o mock para getUserByEmail
+        when(userRepository.findByEmail("Email 1")).thenReturn(Optional.of(user));
+
+        // Configurar o mock do Authentication
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        // Configurar o mock do AuthenticationManager
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
+        // Configurar o mock do JwtUtils
+        String mockToken = "mock-jwt-token";
+        when(jwtUtils.generateJwtToken(authentication)).thenReturn(mockToken);
+        Date expirationDate = new Date(System.currentTimeMillis() + 3600000); // 1 hora no futuro
+        when(jwtUtils.getExpirationFromJwtToken(mockToken)).thenReturn(expirationDate);
+
+        // Executar o método a ser testado
+        LoginResponse response = userTableService.loginUser(loginRequest);
+
+        // Verificar o resultado
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(1);
+        assertThat(response.getName()).isEqualTo("User 1");
+        assertThat(response.getEmail()).isEqualTo("Email 1");
+        assertThat(response.getRole()).isEqualTo(Role.USER);
+        assertThat(response.getToken()).isEqualTo(mockToken);
+        assertThat(response.getExpires()).isEqualTo(expirationDate.getTime());
+
+        // Verificar as chamadas de método
+        verify(userRepository).findByEmail("Email 1");
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtUtils).generateJwtToken(authentication);
+        verify(jwtUtils).getExpirationFromJwtToken(mockToken);
+    }
+
+    @Test
+    void whenLoginUser_withNonExistentUser_thenReturnNull() {
+        // Configurar o mock para getUserByEmail retornar null
+        when(userRepository.findByEmail("Email 1")).thenReturn(Optional.empty());
+
+        // Executar o método a ser testado
+        LoginResponse response = userTableService.loginUser(loginRequest);
+
+        // Verificar o resultado
+        assertThat(response).isNull();
+
+        // Verificar que apenas getUserByEmail foi chamado, e não os outros métodos
+        verify(userRepository).findByEmail("Email 1");
+        verifyNoInteractions(authenticationManager);
+        verifyNoInteractions(jwtUtils);
+    }
+
+    @Test
+    void whenLoginUser_withAuthenticationException_thenHandleException() {
+        // Configurar o mock para getUserByEmail
+        when(userRepository.findByEmail("Email 1")).thenReturn(Optional.of(user));
+
+        // Configurar o AuthenticationManager para lançar uma exceção
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new RuntimeException("Authentication failed"));
+
+        // Executar o método e verificar que a exceção é propagada
+        try {
+            userTableService.loginUser(loginRequest);
+            // Se não lançar exceção, falha no teste
+            org.junit.jupiter.api.Assertions.fail("Expected exception was not thrown");
+        } catch (RuntimeException e) {
+            assertThat(e.getMessage()).isEqualTo("Authentication failed");
+        }
+
+        // Verificar as chamadas de método
+        verify(userRepository).findByEmail("Email 1");
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verifyNoInteractions(jwtUtils);
+    }
+
 }
