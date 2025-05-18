@@ -11,7 +11,7 @@ public class LoginResponse {
     private final Integer id;
     private final String name;
     private final String email;
-    private Role role;
+    private final Role role;
     private final String token;
     private final Long expires;
 }
