@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ua.deti.tqs.entities.types.Role;
 
-import java.util.List;
-
 @Getter
 @AllArgsConstructor
 public class LoginResponse {
