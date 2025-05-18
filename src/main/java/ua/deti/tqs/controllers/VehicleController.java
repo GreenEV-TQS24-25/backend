@@ -46,7 +46,7 @@ public class VehicleController {
     @Operation(summary = "Create a new Vehicle", description = "Creates a new vehicle.")
     @ApiResponse(responseCode = "200", description = "Vehicle created successfully")
     @ApiResponse(responseCode = "404", description = "No vehicle found")
-    public ResponseEntity<Vehicle> createVehicle(Vehicle vehicle) {
+    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
         int userId = getAuthenticatedUser().getId();
         log.info("Creating new vehicle {}", vehicle);
 
