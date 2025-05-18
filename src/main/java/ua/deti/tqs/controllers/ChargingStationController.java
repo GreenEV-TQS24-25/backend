@@ -23,6 +23,7 @@ import ua.deti.tqs.utils.Constants;
 public class ChargingStationController {
   private static final String PUB_BASE_PATH = "public/charging-stations";
   private static final String PRIV_BASE_PATH = "private/charging-stations";
+
   private final ChargingStationService chargingStationService;
 
   @GetMapping(PUB_BASE_PATH + "/all")
