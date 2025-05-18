@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.Role;
 
 import java.math.BigDecimal;
@@ -25,14 +25,14 @@ class ChargingStationRepositoryTest {
     @Autowired
     private ChargingStationRepository chargingStationRepository;
 
-    private UserTable operator1;
+    private User operator1;
 
     @BeforeEach
     void setUp() {
         // given
         entityManager.clear();
 
-        operator1 = new UserTable();
+        operator1 = new User();
         operator1.setId(1);
         operator1.setName("Operator 1");
         operator1.setPassword("password");

@@ -35,7 +35,7 @@ public class ChargingStation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id")
-    private UserTable operator;
+    private User operator;
 
     @Column(name = "last_maintenance")
     private LocalDate lastMaintenance;
