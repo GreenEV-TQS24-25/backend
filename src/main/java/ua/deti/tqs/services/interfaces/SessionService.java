@@ -9,9 +9,7 @@ public interface SessionService {
 
     List<Session> getAllSessionsByUserId(int userId);
 
-    Session createSession(int userId, int vehicleId, Session session);
-
-    Session updateSession(int userId, int sessionId, Session session);
+    Session createSession(int userId, Session session);
 
     boolean deleteSession(int userId, int sessionId);
 }
