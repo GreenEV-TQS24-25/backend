@@ -77,11 +77,11 @@ public class SessionController {
         return new ResponseEntity<>(newSession, HttpStatus.OK);
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/{sessionId}")
     @Operation(summary = "Delete a Session", description = "Deletes a session.")
     @ApiResponse(responseCode = "200", description = "Session deleted successfully")
     @ApiResponse(responseCode = "404", description = "No session found")
-    public ResponseEntity<Void> deleteSession(int sessionId) {
+    public ResponseEntity<Void> deleteSession(@PathVariable("sessionId") int sessionId) {
         log.info("Deleting session with id {}", sessionId);
         int userId = getAuthenticatedUser().getId();
 
