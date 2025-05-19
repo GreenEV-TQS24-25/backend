@@ -92,9 +92,6 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     newChargingStation.setLon(chargingStation.getLon());
     newChargingStation.setOperator(chargingStation.getOperator());
 
-    if (chargingStation.getLastMaintenance() != null)
-      newChargingStation.setLastMaintenance(chargingStation.getLastMaintenance());
-
     if (chargingStation.getPhotoUrl() != null)
       newChargingStation.setPhotoUrl(chargingStation.getPhotoUrl());
 
@@ -123,9 +120,6 @@ public class ChargingStationServiceImpl implements ChargingStationService {
       log.debug("The Charging station doesn't belong to operator with id {}", operatorId);
       return null;
     }
-
-    if (chargingStation.getLastMaintenance() != null)
-      existingChargingStation.setLastMaintenance(chargingStation.getLastMaintenance());
 
     if (chargingStation.getPhotoUrl() != null)
       existingChargingStation.setPhotoUrl(chargingStation.getPhotoUrl());

@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -79,8 +78,7 @@ class ChargingSpotControllerTest {
     testStation.setLat(new BigDecimal("40.7128"));
     testStation.setLon(new BigDecimal("-74.0060"));
     testStation.setOperator(testOperator);
-    testStation.setLastMaintenance(LocalDate.now());
-    testStation.setPhotoUrl("http://test.com/photo.jpg");
+    testStation.setPhotoUrl("https://test.com/photo.jpg");
 
     testSpot = new ChargingSpot();
     testSpot.setId(1);

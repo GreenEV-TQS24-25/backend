@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.Vehicle;
 import ua.deti.tqs.entities.types.Role;
-import ua.deti.tqs.repositories.UserRepository;
 import ua.deti.tqs.repositories.VehicleRepository;
 
 import java.util.List;
@@ -25,8 +24,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class VehicleServiceTest {
     @Mock private VehicleRepository vehicleRepository;
-
-    @Mock private UserRepository userRepository;
 
     @InjectMocks
     private VehicleServiceImpl chargingStationService;

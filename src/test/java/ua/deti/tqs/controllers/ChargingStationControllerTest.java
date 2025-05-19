@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -70,8 +69,7 @@ class ChargingStationControllerTest {
     testStation.setLat(new BigDecimal("40.712776"));
     testStation.setLon(new BigDecimal("-74.005974"));
     testStation.setOperator(operator);
-    testStation.setLastMaintenance(LocalDate.now());
-    testStation.setPhotoUrl("http://example.com/photo.jpg");
+    testStation.setPhotoUrl("https://example.com/photo.jpg");
 
     ChargingStation testStation2 = new ChargingStation();
     testStation2.setId(2);
@@ -225,12 +223,6 @@ class ChargingStationControllerTest {
     int stationId = 99;
     int operatorId = 99;
     when(chargingStationService.deleteChargingStation(stationId, operatorId)).thenReturn(false);
-    StringBuilder urlBuilder = new StringBuilder();
-    urlBuilder
-        .append("/")
-        .append(Constants.API_V1)
-        .append("private/charging-stations/")
-        .append(stationId);
     mockMvc
         .perform(
             delete("/" + Constants.API_V1 + "private/charging-stations/" + stationId)
