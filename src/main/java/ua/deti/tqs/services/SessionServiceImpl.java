@@ -3,11 +3,17 @@ package ua.deti.tqs.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.Session;
+import ua.deti.tqs.entities.Vehicle;
+import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.SessionRepository;
+import ua.deti.tqs.repositories.VehicleRepository;
 import ua.deti.tqs.services.interfaces.SessionService;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -15,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SessionServiceImpl implements SessionService {
      private final SessionRepository sessionRepository;
+     private final ChargingSpotRepository chargingSpotRepository;
      private final ChargingStationRepository chargingStationRepository;
      private final VehicleRepository vehicleRepository;
 
@@ -54,40 +61,45 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Session createSession(int userId, int vehicleId, Session session) {
+    public Session createSession(int userId, Session session) {
         log.debug("Creating new session {}", session);
-
-
-        int errorCount = 0;
-
-        if (session.getVehicle() == null) {
-            log.debug("Invalid session vehicle, vehicle is null");
-            errorCount++;
-        } else if (session.getVehicle().getUser().getId() != userId) {
-            log.debug("Invalid session vehicle, user id {} does not match vehicle user id {}", userId, session.getVehicle().getUser().getId());
-            errorCount++;
-        }
-
-        if (session.getChargingSpot() == null) {
-            log.debug("Invalid session charging spot, charging spot is null");
+        Vehicle vehicle = vehicleRepository.findById(session.getVehicle().getId()).orElse(null);
+        if (vehicle == null) {
+            log.debug("Invalid session vehicle, vehicle with id {} not found", session.getVehicle().getId());
+            return null;
+        } else if (vehicle.getUser().getId() != userId) {
+            log.debug("Invalid session vehicle, user id {} does not match vehicle user id {}", userId, vehicle.getUser().getId());
             return null;
         }
 
-        if (session.getChargingSpot().getStation() == null) {
-            log.debug("Invalid session charging spot station, station is null");
-            errorCount++;
-        } else if (chargingStationRepository.findById(session.getChargingSpot().getStation().getId()).isEmpty()) {
-            log.debug("Invalid session charging spot station, station with id {} not found", session.getChargingSpot().getStation().getId());
-            errorCount++;
+        ChargingSpot chargingSpot = chargingSpotRepository.findById(session.getChargingSpot().getId()).orElse(null);
+
+        if (chargingSpot == null) {
+            log.debug("Invalid session charging spot, charging spot with id {} not found", session.getChargingSpot().getId());
+            return null;
         }
+
+        List<Session> sessions = sessionRepository.findAllByChargingSpot_Id(chargingSpot.getId()).orElse(null);
+        if (sessions != null) {
+            for (Session s : sessions) {
+                Instant startTime = session.getStartTime();
+                int duration = session.getDuration();
+                if (s.getStartTime().isBefore(startTime.plusSeconds(duration)) && s.getStartTime().plusSeconds(s.getDuration()).isAfter(startTime)) {
+                    log.debug("Invalid session charging spot, charging spot with id {} is already in use", session.getChargingSpot().getId());
+                    return null;
+                }
+            }
+        }
+
+        int errorCount = 0;
 
         if (session.getStartTime() == null) {
             log.debug("Invalid session start time, start time is null");
             errorCount++;
         }
 
-        if (session.getTotalCost() == null) {
-            log.debug("Invalid session total cost, total cost is null");
+        if (session.getDuration() <= 0) {
+            log.debug("Invalid session duration, duration is less than or equal to 0");
             errorCount++;
         }
 
@@ -96,17 +108,15 @@ public class SessionServiceImpl implements SessionService {
         }
 
         Session newSession = new Session();
-        newSession.setVehicle(session.getVehicle());
-        newSession.setChargingSpot(session.getChargingSpot());
+        newSession.setVehicle(vehicle);
+        newSession.setChargingSpot(chargingSpot);
         newSession.setStartTime(session.getStartTime());
-        newSession.setTotalCost(session.getTotalCost());
+        newSession.setDuration(session.getDuration());
+
+        newSession.setTotalCost(chargingSpot.getPricePerKwh().multiply(BigDecimal.valueOf(session.getDuration())));
+
 
         return sessionRepository.save(newSession);
-    }
-
-    @Override
-    public Session updateSession(int userId, int sessionId, Session session) {
-        return null;
     }
 
     @Override
@@ -129,12 +139,3 @@ public class SessionServiceImpl implements SessionService {
         return true;
     }
 }
-
-
-
-//user_id          INTEGER REFERENCES user_table (id),
-//vehicle_id       INTEGER REFERENCES vehicle (id),
-//charging_spot_id INTEGER REFERENCES charging_spot (id),
-//start_time       TIMESTAMP NOT NULL,
-//duration        INTEGER NOT NULL DEFAULT 30,
-//total_cost       DECIMAL(8, 2)
