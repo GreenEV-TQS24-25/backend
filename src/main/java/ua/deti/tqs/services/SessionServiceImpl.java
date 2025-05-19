@@ -33,11 +33,10 @@ public class SessionServiceImpl implements SessionService {
             log.debug("The station with id {} does not exist", stationId);
             return List.of();
         }
-        List<Session> sessions = sessionRepository.findAllByChargingSpot_Station_Id(stationId).orElse(null);
+        List<Session> sessions = sessionRepository.findAllByChargingSpot_Station_Id(stationId).orElse(List.of());
 
-        if (sessions == null) {
+        if (sessions.isEmpty()) {
             log.debug("No sessions found with station id {}", stationId);
-            return List.of();
         }
 
         log.debug(
