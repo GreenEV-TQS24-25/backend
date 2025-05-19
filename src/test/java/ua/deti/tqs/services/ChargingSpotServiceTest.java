@@ -15,7 +15,6 @@ import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +50,6 @@ class ChargingSpotServiceTest {
         chargingStation1.setLat(BigDecimal.valueOf(40.7128));
         chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
         chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
-        chargingStation1.setLastMaintenance(LocalDate.parse("2023-01-01"));
 
         operator1 = new User();
         operator1.setId(1);
@@ -72,9 +70,9 @@ class ChargingSpotServiceTest {
         List<ChargingSpot> found = chargingSpotService.getAllChargingSpotsByStationId(chargingStation1.getId());
 
         assertThat(found).isNotEmpty();
-        assertThat(found.get(0).getId()).isEqualTo(chargingSpot.getId());
-        assertThat(found.get(0).getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
-        assertThat(found.get(0).getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
+        assertThat(found.getFirst().getId()).isEqualTo(chargingSpot.getId());
+        assertThat(found.getFirst().getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
+        assertThat(found.getFirst().getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
         verify(chargingSpotRepository).findAllByStation_Id(chargingStation1.getId());
     }

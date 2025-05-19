@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +43,6 @@ class ChargingStationServiceTest {
     chargingStation1.setLat(BigDecimal.valueOf(40.7128));
     chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
     chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
-    chargingStation1.setLastMaintenance(LocalDate.parse("2023-01-01"));
 
     operator1 = new User();
     operator1.setId(1);
@@ -419,7 +417,6 @@ class ChargingStationServiceTest {
   void whenCreateChargingStation_withTheBasicInfo_thenReturnChargingStation() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     chargingStation1.setPhotoUrl(null);
-    chargingStation1.setLastMaintenance(null);
 
     when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
 
@@ -517,7 +514,6 @@ class ChargingStationServiceTest {
     updatedChargingStation.setLat(BigDecimal.valueOf(40.7128));
     updatedChargingStation.setLon(BigDecimal.valueOf(-74.0060));
     updatedChargingStation.setPhotoUrl("https://example.com/updated_photo.jpg");
-    updatedChargingStation.setLastMaintenance(LocalDate.parse("2023-01-01"));
     updatedChargingStation.setOperator(operator1);
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
@@ -566,7 +562,6 @@ class ChargingStationServiceTest {
     updatedChargingStation.setLat(null);
     updatedChargingStation.setLon(null);
     updatedChargingStation.setPhotoUrl(null);
-    updatedChargingStation.setLastMaintenance(null);
 
     updatedChargingStation.setOperator(operator1);
 
@@ -595,7 +590,6 @@ class ChargingStationServiceTest {
     updatedChargingStation.setLat(BigDecimal.valueOf(40.7128));
     updatedChargingStation.setLon(BigDecimal.valueOf(-74.0060));
     updatedChargingStation.setPhotoUrl("https://example.com/updated_photo.jpg");
-    updatedChargingStation.setLastMaintenance(LocalDate.parse("2023-01-01"));
     updatedChargingStation.setOperator(operator1);
 
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));

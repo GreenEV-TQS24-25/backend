@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -36,9 +35,6 @@ public class ChargingStation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operator_id")
     private User operator;
-
-    @Column(name = "last_maintenance")
-    private LocalDate lastMaintenance;
 
     @Size(max = 255)
     @Column(name = "photo_url")

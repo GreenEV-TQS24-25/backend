@@ -210,7 +210,7 @@ class UserControllerTest {
 
   @Test
   void whenLoginWithInvalidCredentials_thenReturnUnauthorized() throws Exception {
-    LoginRequest loginRequest = new LoginRequest("wrong@example.com", "wrongpassword");
+    LoginRequest loginRequest = new LoginRequest("wrong@example.com", "wrong password");
 
     when(userService.loginUser(any(LoginRequest.class))).thenReturn(null);
 
@@ -244,7 +244,7 @@ class UserControllerTest {
     updatedUser.setId(testUser.getId());
     updatedUser.setName("Updated Name");
     updatedUser.setEmail(testUser.getEmail());
-    updatedUser.setPassword("newpassword");
+    updatedUser.setPassword("new password");
     updatedUser.setRole(testUser.getRole());
 
     LoginResponse loginResponse =
