@@ -63,7 +63,7 @@ public class SessionController {
     @Operation(summary = "Create a new Session", description = "Creates a new session.")
     @ApiResponse(responseCode = "200", description = "Session created successfully")
     @ApiResponse(responseCode = "404", description = "No session found")
-    public ResponseEntity<Session> createSession(Session session) {
+    public ResponseEntity<Session> createSession(@RequestBody Session session) {
         int userId = getAuthenticatedUser().getId();
         log.info("Creating new session {}", session);
 
