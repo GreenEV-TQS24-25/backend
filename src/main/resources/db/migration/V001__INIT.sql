@@ -30,7 +30,6 @@ CREATE TABLE charging_station
     lat              DECIMAL(9, 6) NOT NULL,
     lon              DECIMAL(9, 6) NOT NULL,
     operator_id      INTEGER REFERENCES user_table (id),
-    last_maintenance DATE,
     photo_url        VARCHAR(255)
 );
 
@@ -49,11 +48,10 @@ CREATE TABLE session
 (
     id               SERIAL PRIMARY KEY,
     uuid             VARCHAR(255)      NOT NULL,
-    user_id          INTEGER REFERENCES user_table (id),
     vehicle_id       INTEGER REFERENCES vehicle (id),
     charging_spot_id INTEGER REFERENCES charging_spot (id),
     start_time       TIMESTAMP NOT NULL,
-    end_time         TIMESTAMP,
+    duration         INTEGER NOT NULL DEFAULT 30,
     total_cost       DECIMAL(8, 2)
 );
 

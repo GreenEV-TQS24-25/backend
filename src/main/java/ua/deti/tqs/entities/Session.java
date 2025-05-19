@@ -25,10 +25,6 @@ public class Session {
     private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
@@ -40,8 +36,8 @@ public class Session {
     @Column(name = "start_time", nullable = false)
     private Instant startTime;
 
-    @Column(name = "end_time")
-    private Instant endTime;
+    @Column(name = "duration", nullable = false)
+    private int duration = 30;
 
     @Column(name = "total_cost", precision = 8, scale = 2)
     private BigDecimal totalCost;
