@@ -6,19 +6,18 @@ CREATE TYPE SONIC AS ENUM ( 'NORMAL', 'FAST', 'FASTPP'); -- speed charging
 
 CREATE TABLE user_table
 (
-    id       SERIAL OPRIMARY KEY,
+    id   SERIAL PRIMARY KEY,
     name     VARCHAR(255)        NOT NULL,
     email    VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255)        NOT NULL,
-    role     ROLE                NOT NULL DEFAULT 'USER',
+    role ROLE NOT NULL DEFAULT 'USER'
 
-    CONSTRAINT pk_user PRIMARY KEY (id)
 );
 
 CREATE TABLE vehicle
 (
     id             SERIAL PRIMARY KEY,
-    user_id        INTEGER REFERENCES user_table (id),
+    user_id INTEGER REFERENCES user_table (id) ON DELETE CASCADE,
     brand          VARCHAR(50)        NOT NULL,
     model          VARCHAR(50)        NOT NULL,
     license_plate  VARCHAR(20) UNIQUE NOT NULL,
@@ -27,12 +26,12 @@ CREATE TABLE vehicle
 
 CREATE TABLE charging_station
 (
-    id               SERIAL PRIMARY KEY,
-    name             VARCHAR(100)  NOT NULL,
-    lat              DECIMAL(9, 6) NOT NULL,
-    lon              DECIMAL(9, 6) NOT NULL,
-    operator_id      INTEGER REFERENCES user_table (id),
-    photo_url        VARCHAR(255)
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100)  NOT NULL,
+    lat         DECIMAL(9, 6) NOT NULL,
+    lon         DECIMAL(9, 6) NOT NULL,
+    operator_id INTEGER REFERENCES user_table (id) ON DELETE CASCADE,
+    photo_url   VARCHAR(255)
 );
 
 CREATE TABLE charging_spot
@@ -49,11 +48,11 @@ CREATE TABLE charging_spot
 CREATE TABLE session
 (
     id               SERIAL PRIMARY KEY,
-    uuid             VARCHAR(255)      NOT NULL,
+    uuid       VARCHAR(255) NOT NULL,
     vehicle_id       INTEGER REFERENCES vehicle (id),
     charging_spot_id INTEGER REFERENCES charging_spot (id),
-    start_time       TIMESTAMP NOT NULL,
-    duration         INTEGER NOT NULL DEFAULT 30,
+    start_time TIMESTAMP    NOT NULL,
+    duration   INTEGER      NOT NULL DEFAULT 30,
     total_cost       DECIMAL(8, 2)
 );
 
