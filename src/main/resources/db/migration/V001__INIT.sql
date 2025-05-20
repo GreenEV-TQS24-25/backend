@@ -6,11 +6,13 @@ CREATE TYPE SONIC AS ENUM ( 'NORMAL', 'FAST', 'FASTPP'); -- speed charging
 
 CREATE TABLE user_table
 (
-    id       SERIAL PRIMARY KEY,
+    id       SERIAL OPRIMARY KEY,
     name     VARCHAR(255)        NOT NULL,
     email    VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255)        NOT NULL,
-    role     ROLE                NOT NULL DEFAULT 'USER'
+    role     ROLE                NOT NULL DEFAULT 'USER',
+
+    CONSTRAINT pk_user PRIMARY KEY (id)
 );
 
 CREATE TABLE vehicle
