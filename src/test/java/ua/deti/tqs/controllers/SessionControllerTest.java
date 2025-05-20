@@ -1,22 +1,6 @@
 package ua.deti.tqs.controllers;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,17 +13,30 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.deti.tqs.components.AuthTokenFilter;
-import ua.deti.tqs.entities.ChargingSpot;
-import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.Session;
-import ua.deti.tqs.entities.User;
-import ua.deti.tqs.entities.Vehicle;
+import ua.deti.tqs.entities.*;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.entities.types.SpotState;
 import ua.deti.tqs.services.interfaces.SessionService;
 import ua.deti.tqs.services.interfaces.UserService;
 import ua.deti.tqs.utils.Constants;
 import ua.deti.tqs.utils.SecurityUtils;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(SessionController.class)
@@ -203,8 +200,7 @@ class SessionControllerTest {
         int sessionId = testSession.getId();
         when(sessionService.deleteSession(testUser.getId(), sessionId)).thenReturn(true);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "private/session")
-                        .param("sessionId", String.valueOf(sessionId))
+        mockMvc.perform(delete("/" + Constants.API_V1 + "private/session/" + sessionId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -214,8 +210,7 @@ class SessionControllerTest {
         int sessionId = 99;
         when(sessionService.deleteSession(testUser.getId(), sessionId)).thenReturn(false);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "private/session")
-                        .param("sessionId", String.valueOf(sessionId))
+        mockMvc.perform(delete("/" + Constants.API_V1 + "private/session/" + sessionId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

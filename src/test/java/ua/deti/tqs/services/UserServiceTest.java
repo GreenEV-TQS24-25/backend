@@ -32,12 +32,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Mock
     private UserRepository userRepository;
-
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -165,7 +162,7 @@ class UserServiceTest {
         assertThat(updated).isNotNull();
         assertThat(updated.getName()).isEqualTo("Updated User");
         assertThat(updated.getEmail()).isEqualTo("Updated Email");
-        assertThat(updated.getPassword()).isEqualTo("Updated Password");
+        assertThat(passwordEncoder.matches("Updated Password", updated.getPassword())).isTrue();
         assertThat(updated.getRole()).isEqualTo(Role.OPERATOR);
     }
 
