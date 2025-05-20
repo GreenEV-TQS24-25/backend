@@ -45,7 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify sonar:sonar \
+          mvn -B verify failsafe:integration-test sonar:sonar \
           -Dsonar.projectKey=GreenEV-TQS24-25_backend
 
       - name: Publish results to Xray
