@@ -45,7 +45,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify failsafe:integration-test sonar:sonar \
-          -Dsonar.projectKey=greenev-tqs24-25
+          -Dsonar.projectKey=GreenEV-TQS24-25_backend
 
       - name: Publish results to Xray
         uses: mikepenz/xray-action@v3
@@ -54,5 +54,5 @@ jobs:
           password: ${{ secrets.XRAY_CLIENT_SECRET }}
           testFormat: "junit"
           testPaths: "**/surefire-reports/TEST-*.xml"
-          testExecKey: "CC-94"
-          projectKey: "CC"
+          testExecKey: "GREEN-73"
+          projectKey: "GREEN"
