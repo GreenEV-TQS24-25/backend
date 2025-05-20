@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - main
-      - GREEN-13-CI
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
   workflow_dispatch:
 
 jobs:
@@ -46,8 +45,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify failsafe:integration-test sonar:sonar \
-          -Dsonar.projectKey=GreenEV-TQS24-25_backend \
-          -Dsonar.branch.name=${{ github.head_ref }} \
+          -Dsonar.projectKey=GreenEV-TQS24-25_backend
 
       - name: Publish results to Xray
         uses: mikepenz/xray-action@v3
