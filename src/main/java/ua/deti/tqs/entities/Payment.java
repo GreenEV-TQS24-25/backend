@@ -37,13 +37,12 @@ public class Payment {
     @Size(max = 100)
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
-    @ColumnDefault("CURRENT_TIMESTAMP")
+
     @Column(name = "date_hour")
-    private Instant dateHour;
+    private Instant dateHour = Instant.now();
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'PENDING'")
     @Column(name = "state", columnDefinition = "payment_state not null")
-    private PaymentState state;
+    private PaymentState state = PaymentState.PENDING;
 
 }

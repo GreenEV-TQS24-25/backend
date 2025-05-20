@@ -1,5 +1,13 @@
 package ua.deti.tqs.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,299 +16,632 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.UserTable;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingStationRepository;
-import ua.deti.tqs.repositories.UserTableRepository;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.mockito.Mockito.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import ua.deti.tqs.repositories.UserRepository;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class ChargingStationServiceTest {
 
-    @Mock
-    private ChargingStationRepository chargingStationRepository;
+  @Mock private ChargingStationRepository chargingStationRepository;
 
-    @Mock
-    private UserTableRepository userTableRepository;
+  @Mock private UserRepository userRepository;
 
-    @InjectMocks
-    private ChargingStationServiceImpl chargingStationService;
+  @InjectMocks private ChargingStationServiceImpl chargingStationService;
 
-    private ChargingStation chargingStation1;
+  private ChargingStation chargingStation1;
 
-    private UserTable operator1;
+  private User operator1;
 
-    @BeforeEach
-    void setUp() {
-        chargingStation1 = new ChargingStation();
-        chargingStation1.setId(1);
-        chargingStation1.setName("Charging Station 1");
-        chargingStation1.setLat(BigDecimal.valueOf(40.7128));
-        chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
-        chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
-        chargingStation1.setLastMaintenance(LocalDate.parse("2023-01-01"));
+  @BeforeEach
+  void setUp() {
+    chargingStation1 = new ChargingStation();
+    chargingStation1.setId(1);
+    chargingStation1.setName("Charging Station 1");
+    chargingStation1.setLat(BigDecimal.valueOf(40.7128));
+    chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
+    chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
 
-        operator1 = new UserTable();
-        operator1.setId(1);
-        operator1.setRole(Role.OPERATOR);
-        chargingStation1.setOperator(operator1);
+    operator1 = new User();
+    operator1.setId(1);
+    operator1.setRole(Role.OPERATOR);
+    chargingStation1.setOperator(operator1);
+  }
 
-    }
+  @Test
+  void getAllChargingStationsByOperatorId_operatorValid_stationsFound() {
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findAllByOperator_Id(1))
+        .thenReturn(Optional.of(List.of(chargingStation1)));
 
-    @Test
-    void whenGetAllChargingStationsByOperatorId_thenReturnList() {
-        List<ChargingStation> chargingStations = List.of(chargingStation1);
-        when(chargingStationRepository.findAllByOperator_Id(1)).thenReturn(Optional.of(chargingStations));
+    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
-        List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    assertThat(result).isNotEmpty();
+  }
 
-        assertThat(result).isEqualTo(chargingStations);
-        verify(chargingStationRepository).findAllByOperator_Id(1);
-    }
+  @Test
+  void getAllChargingStationsByOperatorId_operatorValid_noStationsFound() {
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findAllByOperator_Id(1)).thenReturn(Optional.empty());
 
-    @Test
-    void whenGetAllChargingStations_withNullOperatorId_thenReturnEmptyList() {
-        when(chargingStationRepository.findAllByOperator_Id(1)).thenReturn(Optional.empty());
+    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
-        List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    assertThat(result).isEmpty();
+  }
 
-        assertThat(result).isEmpty();
-        verify(chargingStationRepository).findAllByOperator_Id(1);
-    }
+  @Test
+  void whenGetAllChargingStationsByOperatorId_withUserNotOperator_thenReturnEmptyList() {
+    operator1.setRole(Role.USER);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
-    @Test
-    void whenGetAllChargingStationsByOperatorId_withInvalidOperatorId_thenReturnEmptyList() {
-        when(chargingStationRepository.findAllByOperator_Id(999)).thenReturn(Optional.empty());
+    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
-        List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(999);
+    assertThat(result).isEmpty();
+  }
 
-        assertThat(result).isEmpty();
-        verify(chargingStationRepository).findAllByOperator_Id(999);
-    }
+  @Test
+  void whenCreateChargingStation_withOperatorIdMismatch_thenReturnNull() {
+    User differentOperator = new User();
+    differentOperator.setId(2);
+    differentOperator.setRole(Role.OPERATOR);
+    chargingStation1.setOperator(differentOperator);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    ChargingStation result = chargingStationService.createChargingStation(chargingStation1, 1);
 
-    @Test
-    void whenGetAllChargingStations_thenReturnList() {
-        List<ChargingStation> chargingStations = List.of(chargingStation1);
-        when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+    assertThat(result).isNull();
+  }
 
-        List<ChargingStation> result = chargingStationService.getAllChargingStations();
+  @Test
+  void whenCreateChargingStation_withOperatorIdCorrect_andChargingStationIdIncorrect() {
+    User differentOperator = new User();
+    differentOperator.setId(2);
+    differentOperator.setRole(Role.OPERATOR);
+    chargingStation1.setOperator(differentOperator);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(userRepository.findById(2)).thenReturn(Optional.of(differentOperator));
 
-        assertThat(result).isEqualTo(chargingStations);
-        verify(chargingStationRepository).findAll();
-    }
+    ChargingStation result = chargingStationService.createChargingStation(chargingStation1, 1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withOperatorBeingNull_thenReturnNull() {
+    chargingStation1.setOperator(null);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
-    @Test
-    void whenGetAllChargingStations_withEmptyList_thenReturnEmptyList() {
-        when(chargingStationRepository.findAll()).thenReturn(List.of());
+    ChargingStation result = chargingStationService.createChargingStation(chargingStation1, 1);
 
-        List<ChargingStation> result = chargingStationService.getAllChargingStations();
+    assertThat(result).isNull();
+  }
 
-        assertThat(result).isEmpty();
-        verify(chargingStationRepository).findAll();
-    }
+  @Test
+  void whenCreateChargingStation_withLatNull_thenReturnNull() {
+    chargingStation1.setLat(null);
+    chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result = chargingStationService.createChargingStation(chargingStation1, 1);
 
-    @Test
-    void whenCreateChargingStation_thenReturnChargingStation() {
-        when(userTableRepository.findById(1)).thenReturn(Optional.of(operator1));
-        when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withLonNull_thenReturnNull() {
+    chargingStation1.setLat(BigDecimal.valueOf(40.7128));
+    chargingStation1.setLon(null);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result = chargingStationService.createChargingStation(chargingStation1, 1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenUpdateChargingStation_withChangedOperator_thenIgnoreChange() {
+    User newOperator = new User();
+    newOperator.setId(2);
+    chargingStation1.setOperator(newOperator);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
+
+    ChargingStation result = chargingStationService.updateChargingStation(1, chargingStation1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withNonMatchingOperatorId_thenReturnNull() {
+    // Configura um ChargingStation com um operador diferente do ID fornecido
+    User differentOperator = new User();
+    differentOperator.setId(2);
+    differentOperator.setRole(Role.OPERATOR);
+
+    ChargingStation stationWithDifferentOperator = new ChargingStation();
+    stationWithDifferentOperator.setName("Test Station");
+    stationWithDifferentOperator.setLat(BigDecimal.valueOf(40.7128));
+    stationWithDifferentOperator.setLon(BigDecimal.valueOf(-74.0060));
+    stationWithDifferentOperator.setOperator(differentOperator);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(stationWithDifferentOperator, 1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withNullStation_thenReturnNull() {
+    ChargingStation result = chargingStationService.createChargingStation(null, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withNullName_thenReturnNull() {
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName(null); // Nome nulo
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withInvalidLatitude_thenReturnNull() {
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName("Invalid Station");
+    invalidStation.setLat(
+        BigDecimal.valueOf(100)); // Latitude inválida (fora do intervalo -90 a 90)
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withInvalidLongitude_thenReturnNull() {
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName("Invalid Station");
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(
+        BigDecimal.valueOf(190)); // Longitude inválida (fora do intervalo -180 a 180)
+    invalidStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withEmptyName_thenReturnNull() {
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName(""); // Nome vazio
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withOperatorRoleNotOperator_thenReturnNull() {
+    // Configurar um usuário que não tem o papel de OPERATOR
+    User nonOperatorUser = new User();
+    nonOperatorUser.setId(1);
+    nonOperatorUser.setRole(Role.USER); // Define papel como USER em vez de OPERATOR
+
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName("Invalid Station");
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(nonOperatorUser);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1)); // operator1 é válido
+
+    ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withDifferentOperatorId_thenReturnNull() {
+    // Configurar um operador com ID diferente do ID autenticado
+    User differentOperator = new User();
+    differentOperator.setId(2); // ID diferente
+    differentOperator.setRole(Role.OPERATOR);
+
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName("Invalid Station");
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(differentOperator);
+
+    when(userRepository.findById(1))
+        .thenReturn(Optional.of(operator1)); // operator1 é válido com ID 1
 
-        ChargingStation result = chargingStationService.createChargingStation(chargingStation1);
+    ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withInvalidOperatorIdZero_thenReturnNull() {
+    // Configurar um operador com ID 0 (inválido)
+    User invalidOperator = new User();
+    invalidOperator.setId(0); // ID inválido (zero)
+    invalidOperator.setRole(Role.OPERATOR);
 
-        assertThat(result).isEqualTo(chargingStation1);
-    }
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName("Invalid Station");
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(invalidOperator);
 
-    @Test
-    void whenCreateChargingStation_withTheBasicInfo_thenReturnChargingStation() {
-        when(userTableRepository.findById(1)).thenReturn(Optional.of(operator1));
-        chargingStation1.setPhotoUrl(null);
-        chargingStation1.setLastMaintenance(null);
+    when(userRepository.findById(1))
+        .thenReturn(Optional.of(operator1)); // operator1 é válido com ID 1
 
-        when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
+    ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
 
-        ChargingStation result = chargingStationService.createChargingStation(chargingStation1);
+    assertThat(result).isNull();
+  }
 
-        assertThat(result).isEqualTo(chargingStation1);
-    }
+  @Test
+  void whenCreateChargingStation_withInvalidOperatorIdNegative_thenReturnNull() {
+    // Configurar um operador com ID negativo (inválido)
+    User invalidOperator = new User();
+    invalidOperator.setId(-1); // ID inválido (negativo)
+    invalidOperator.setRole(Role.OPERATOR);
 
-    @Test
-    void whenCreateChargingStation_withInvalidData_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setName(null);
-        invalidChargingStation.setLat(null);
-        invalidChargingStation.setLon(null);
+    ChargingStation invalidStation = new ChargingStation();
+    invalidStation.setName("Invalid Station");
+    invalidStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidStation.setOperator(invalidOperator);
 
+    when(userRepository.findById(1))
+        .thenReturn(Optional.of(operator1)); // operator1 é válido com ID 1
 
-        ChargingStation result = chargingStationService.createChargingStation(invalidChargingStation);
+    ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
 
-        assertThat(result).isNull();
-    }
+    assertThat(result).isNull();
+  }
 
-    @Test
-    void whenCreateChargingStation_withPartialInvalidData_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setName("");
-        invalidChargingStation.setLat(BigDecimal.valueOf(100.0));
-        invalidChargingStation.setLon(null);
+  @Test
+  void whenCreateChargingStation_withValidOperatorButDifferentAuthenticatedId_thenReturnNull() {
+    // Caso em que o operador da estação é válido, mas o ID autenticado não corresponde
 
-        ChargingStation result = chargingStationService.createChargingStation(invalidChargingStation);
+    // O operador1 é um operador válido com ID 1
+    ChargingStation validStation = new ChargingStation();
+    validStation.setName("Valid Station");
+    validStation.setLat(BigDecimal.valueOf(40.7128));
+    validStation.setLon(BigDecimal.valueOf(-74.0060));
+    validStation.setOperator(operator1); // operador válido com ID 1
 
-        assertThat(result).isNull();
-    }
+    // Mas tentando criar com ID autenticado 3 (diferente do operador da estação)
+    when(userRepository.findById(3))
+        .thenReturn(Optional.of(operator1)); // simulando que o ID autenticado 3 é válido
 
-    @Test
-    void whenCreateChargingStation_withNullOperator_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setName("Invalid Station");
-        invalidChargingStation.setLat(BigDecimal.valueOf(40.7128));
-        invalidChargingStation.setLon(BigDecimal.valueOf(-74.0060));
-        invalidChargingStation.setOperator(null);
+    ChargingStation result = chargingStationService.createChargingStation(validStation, 3);
 
+    assertThat(result).isNull();
+  }
 
-        ChargingStation result = chargingStationService.createChargingStation(invalidChargingStation);
+  @Test
+  void whenGetAllChargingStationsByOperatorId_thenReturnList() {
+    List<ChargingStation> chargingStations = List.of(chargingStation1);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findAllByOperator_Id(1))
+        .thenReturn(Optional.of(chargingStations));
 
-        assertThat(result).isNull();
-    }
+    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
-    @Test
-    void whenCreateChargingStation_withAUserNotOperator_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setName("Invalid Station");
-        invalidChargingStation.setLat(BigDecimal.valueOf(40.7128));
-        invalidChargingStation.setLon(BigDecimal.valueOf(-74.0060));
+    assertThat(result).isEqualTo(chargingStations);
+    verify(chargingStationRepository).findAllByOperator_Id(1);
+  }
 
+  @Test
+  void whenGetAllChargingStations_withNullOperatorId_thenReturnEmptyList() {
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findAllByOperator_Id(1)).thenReturn(Optional.empty());
+
+    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
-        operator1.setRole(Role.USER);
-        invalidChargingStation.setOperator(operator1);
+    assertThat(result).isEmpty();
+    verify(chargingStationRepository).findAllByOperator_Id(1);
+  }
+
+  @Test
+  void whenGetAllChargingStationsByOperatorId_withInvalidOperatorId_thenReturnEmptyList() {
+
+    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(999);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void whenGetAllChargingStations_thenReturnList() {
+    List<ChargingStation> chargingStations = List.of(chargingStation1);
+    when(chargingStationRepository.findAll()).thenReturn(chargingStations);
 
-        when(userTableRepository.findById(1)).thenReturn(Optional.of(operator1));
+    List<ChargingStation> result = chargingStationService.getAllChargingStations();
+
+    assertThat(result).isEqualTo(chargingStations);
+    verify(chargingStationRepository).findAll();
+  }
+
+  @Test
+  void whenGetAllChargingStations_withEmptyList_thenReturnEmptyList() {
+    when(chargingStationRepository.findAll()).thenReturn(List.of());
+
+    List<ChargingStation> result = chargingStationService.getAllChargingStations();
+
+    assertThat(result).isEmpty();
+    verify(chargingStationRepository).findAll();
+  }
 
-        ChargingStation result = chargingStationService.createChargingStation(invalidChargingStation);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void whenCreateChargingStation_withOperatorNotFound_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setName("Invalid Station");
-        invalidChargingStation.setLat(BigDecimal.valueOf(40.7128));
-        invalidChargingStation.setLon(BigDecimal.valueOf(-74.0060));
-
-        invalidChargingStation.setOperator(operator1);
-
-        when(userTableRepository.findById(1)).thenReturn(Optional.empty());
-
-        ChargingStation result = chargingStationService.createChargingStation(invalidChargingStation);
-        assertThat(result).isNull();
-    }
-
-
-    @Test
-    void whenUpdateChargingStation_thenReturnUpdatedChargingStation() {
-        ChargingStation updatedChargingStation = new ChargingStation();
-        updatedChargingStation.setName("Updated Station");
-        updatedChargingStation.setId(1);
-        updatedChargingStation.setLat(BigDecimal.valueOf(40.7128));
-        updatedChargingStation.setLon(BigDecimal.valueOf(-74.0060));
-        updatedChargingStation.setPhotoUrl("https://example.com/updated_photo.jpg");
-        updatedChargingStation.setLastMaintenance(LocalDate.parse("2023-01-01"));
-        updatedChargingStation.setOperator(operator1);
-
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
-        when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(updatedChargingStation);
-
-        ChargingStation result = chargingStationService.updateChargingStation(1, updatedChargingStation);
-        assertThat(result).isEqualTo(updatedChargingStation);
-    }
-
-    @Test
-    void whenUpdateChargingStation_withInvalidOperatorId_thenReturnNull() {
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.empty());
-
-        ChargingStation result = chargingStationService.updateChargingStation(999, chargingStation1);
-
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void whenUpdateChargingStation_withInvalidOperator_thenReturnNull() {
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
-
-        ChargingStation result = chargingStationService.updateChargingStation(999, chargingStation1);
-
-        assertThat(result).isNull();
-        verify(chargingStationRepository).findById(1);
-    }
-
-    @Test
-    void whenUpdateChargingStation_withNullData_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setId(1);
-        invalidChargingStation.setName(null);
-        invalidChargingStation.setLat(null);
-        invalidChargingStation.setLon(null);
-        invalidChargingStation.setPhotoUrl(null);
-        invalidChargingStation.setLastMaintenance(null);
-        invalidChargingStation.setOperator(operator1);
-
-
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
-
-        ChargingStation result = chargingStationService.updateChargingStation(1, invalidChargingStation);
-
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void whenUpdateChargingStation_withInvalidData_thenReturnNull() {
-        ChargingStation invalidChargingStation = new ChargingStation();
-        invalidChargingStation.setId(1);
-        invalidChargingStation.setName("");
-
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
-        ChargingStation result = chargingStationService.updateChargingStation(1, invalidChargingStation);
-
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void whenDeleteChargingStation_thenReturnTrue() {
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
-
-        boolean result = chargingStationService.deleteChargingStation(1, 1);
-
-        assertThat(result).isTrue();
-        verify(chargingStationRepository).findById(1);
-    }
-
-    @Test
-    void whenDeleteChargingStation_withInvalidId_thenReturnFalse() {
-        when(chargingStationRepository.findById(999)).thenReturn(Optional.empty());
-
-        boolean result = chargingStationService.deleteChargingStation(999, 1);
-
-        assertThat(result).isFalse();
-        verify(chargingStationRepository).findById(999);
-    }
-
-    @Test
-    void whenDeleteChargingStation_withInvalidOperatorId_thenReturnFalse() {
-        when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
-
-        boolean result = chargingStationService.deleteChargingStation(1, 999);
-
-        assertThat(result).isFalse();
-        verify(chargingStationRepository).findById(1);
-    }
-
+  @Test
+  void whenCreateChargingStation_thenReturnChargingStation() {
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(chargingStation1, operator1.getId());
+
+    assertThat(result).isEqualTo(chargingStation1);
+  }
+
+  @Test
+  void whenCreateChargingStation_withTheBasicInfo_thenReturnChargingStation() {
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    chargingStation1.setPhotoUrl(null);
+
+    when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(chargingStation1, operator1.getId());
+
+    assertThat(result).isEqualTo(chargingStation1);
+  }
+
+  @Test
+  void whenCreateChargingStation_withInvalidUser_thenReturnNull() {
+    when(userRepository.findById(999)).thenReturn(Optional.empty());
+
+    ChargingStation result = chargingStationService.createChargingStation(chargingStation1, 999);
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withInvalidData_thenReturnNull() {
+    ChargingStation invalidChargingStation = new ChargingStation();
+    invalidChargingStation.setName(null);
+    invalidChargingStation.setLat(null);
+    invalidChargingStation.setLon(null);
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withPartialInvalidData_thenReturnNull() {
+    ChargingStation invalidChargingStation = new ChargingStation();
+    invalidChargingStation.setName("");
+    invalidChargingStation.setLat(BigDecimal.valueOf(100.0));
+    invalidChargingStation.setLon(null);
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withNullOperator_thenReturnNull() {
+    ChargingStation invalidChargingStation = new ChargingStation();
+    invalidChargingStation.setName("Invalid Station");
+    invalidChargingStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidChargingStation.setLon(BigDecimal.valueOf(-74.0060));
+    invalidChargingStation.setOperator(null);
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withAUserNotOperator_thenReturnNull() {
+    ChargingStation invalidChargingStation = new ChargingStation();
+    invalidChargingStation.setName("Invalid Station");
+    invalidChargingStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidChargingStation.setLon(BigDecimal.valueOf(-74.0060));
+
+    operator1.setRole(Role.USER);
+    invalidChargingStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenCreateChargingStation_withOperatorNotFound_thenReturnNull() {
+    ChargingStation invalidChargingStation = new ChargingStation();
+    invalidChargingStation.setName("Invalid Station");
+    invalidChargingStation.setLat(BigDecimal.valueOf(40.7128));
+    invalidChargingStation.setLon(BigDecimal.valueOf(-74.0060));
+
+    invalidChargingStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+    ChargingStation result =
+        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenUpdateChargingStation_thenReturnUpdatedChargingStation() {
+    ChargingStation updatedChargingStation = new ChargingStation();
+    updatedChargingStation.setName("Updated Station");
+    updatedChargingStation.setId(1);
+    updatedChargingStation.setLat(BigDecimal.valueOf(40.7128));
+    updatedChargingStation.setLon(BigDecimal.valueOf(-74.0060));
+    updatedChargingStation.setPhotoUrl("https://example.com/updated_photo.jpg");
+    updatedChargingStation.setOperator(operator1);
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
+    when(chargingStationRepository.save(any(ChargingStation.class)))
+        .thenReturn(updatedChargingStation);
+
+    ChargingStation result =
+        chargingStationService.updateChargingStation(1, updatedChargingStation);
+    assertThat(result).isEqualTo(updatedChargingStation);
+  }
+
+  @Test
+  void whenUpdateChargingStation_withInvalidOperatorId_thenReturnNull() {
+
+    ChargingStation result = chargingStationService.updateChargingStation(999, chargingStation1);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenUpdateChargingStation_withNonExistentId_thenReturnNull() {
+    ChargingStation stationToUpdate = new ChargingStation();
+    stationToUpdate.setId(999); // ID que não existe
+    stationToUpdate.setName("Non-existent Station");
+    stationToUpdate.setLat(BigDecimal.valueOf(40.7128));
+    stationToUpdate.setLon(BigDecimal.valueOf(-74.0060));
+    stationToUpdate.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findById(999)).thenReturn(Optional.empty());
+
+    ChargingStation result = chargingStationService.updateChargingStation(1, stationToUpdate);
+
+    assertThat(result).isNull();
+
+    verify(chargingStationRepository).findById(999);
+
+    verify(chargingStationRepository, never()).save(any(ChargingStation.class));
+  }
+
+  @Test
+  void whenUpdateChargingStationWithIncompleteData_thenReturnUpdatedChargingStation() {
+    ChargingStation updatedChargingStation = new ChargingStation();
+    updatedChargingStation.setId(1);
+    updatedChargingStation.setName("");
+    updatedChargingStation.setLat(null);
+    updatedChargingStation.setLon(null);
+    updatedChargingStation.setPhotoUrl(null);
+
+    updatedChargingStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
+    when(chargingStationRepository.save(any(ChargingStation.class)))
+        .thenReturn(updatedChargingStation);
+
+    ChargingStation result =
+        chargingStationService.updateChargingStation(1, updatedChargingStation);
+
+    assertThat(result).isEqualTo(updatedChargingStation);
+
+    // now let's change the name to nnull to test thath branch
+    updatedChargingStation.setName(null);
+    result = chargingStationService.updateChargingStation(1, updatedChargingStation);
+
+    assertThat(result).isEqualTo(updatedChargingStation);
+  }
+
+  @Test
+  void whenUpdateChargingStationWithFullData_thenReturnUpdatedChargingStation() {
+    ChargingStation updatedChargingStation = new ChargingStation();
+    updatedChargingStation.setId(1);
+    updatedChargingStation.setName("Updated Station");
+    updatedChargingStation.setLat(BigDecimal.valueOf(40.7128));
+    updatedChargingStation.setLon(BigDecimal.valueOf(-74.0060));
+    updatedChargingStation.setPhotoUrl("https://example.com/updated_photo.jpg");
+    updatedChargingStation.setOperator(operator1);
+
+    when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
+    when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
+    when(chargingStationRepository.save(any(ChargingStation.class)))
+        .thenReturn(updatedChargingStation);
+
+    ChargingStation result =
+        chargingStationService.updateChargingStation(1, updatedChargingStation);
+
+    assertThat(result).isEqualTo(updatedChargingStation);
+  }
+
+  @Test
+  void whenUpdateChargingStation_withInvalidData_thenReturnNull() {
+    ChargingStation invalidChargingStation = new ChargingStation();
+    invalidChargingStation.setId(1);
+    invalidChargingStation.setName("");
+
+    ChargingStation result =
+        chargingStationService.updateChargingStation(1, invalidChargingStation);
+
+    assertThat(result).isNull();
+  }
+
+  @Test
+  void whenDeleteChargingStation_thenReturnTrue() {
+    when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
+
+    boolean result = chargingStationService.deleteChargingStation(1, 1);
+
+    assertThat(result).isTrue();
+    verify(chargingStationRepository).findById(1);
+  }
+
+  @Test
+  void whenDeleteChargingStation_withInvalidId_thenReturnFalse() {
+    when(chargingStationRepository.findById(999)).thenReturn(Optional.empty());
+
+    boolean result = chargingStationService.deleteChargingStation(999, 1);
+
+    assertThat(result).isFalse();
+    verify(chargingStationRepository).findById(999);
+  }
+
+  @Test
+  void whenDeleteChargingStation_withInvalidOperatorId_thenReturnFalse() {
+    when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
+
+    boolean result = chargingStationService.deleteChargingStation(1, 999);
+
+    assertThat(result).isFalse();
+    verify(chargingStationRepository).findById(1);
+  }
 }

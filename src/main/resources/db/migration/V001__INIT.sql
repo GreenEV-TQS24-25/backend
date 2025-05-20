@@ -10,7 +10,7 @@ CREATE TABLE user_table
     name     VARCHAR(255)        NOT NULL,
     email    VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255)        NOT NULL,
-    role     ROLE                NOT NULL
+    role     ROLE                NOT NULL DEFAULT 'USER'
 );
 
 CREATE TABLE vehicle
@@ -20,7 +20,7 @@ CREATE TABLE vehicle
     brand          VARCHAR(50)        NOT NULL,
     model          VARCHAR(50)        NOT NULL,
     license_plate  VARCHAR(20) UNIQUE NOT NULL,
-    connector_type CONNECTOR_TYPE     NOT NULL
+    connector_type CONNECTOR_TYPE     NOT NULL DEFAULT 'SAEJ1772'
 );
 
 CREATE TABLE charging_station
@@ -30,7 +30,6 @@ CREATE TABLE charging_station
     lat              DECIMAL(9, 6) NOT NULL,
     lon              DECIMAL(9, 6) NOT NULL,
     operator_id      INTEGER REFERENCES user_table (id),
-    last_maintenance DATE,
     photo_url        VARCHAR(255)
 );
 
@@ -38,8 +37,8 @@ CREATE TABLE charging_spot
 (
     id                SERIAL PRIMARY KEY,
     station_id        INTEGER REFERENCES charging_station (id),
-    charging_velocity SONIC          NOT NULL,
-    connector_type    CONNECTOR_TYPE NOT NULL,
+    charging_velocity SONIC          NOT NULL DEFAULT 'NORMAL',
+    connector_type    CONNECTOR_TYPE NOT NULL DEFAULT 'SAEJ1772',
     power_kw          DECIMAL(7, 2)  NOT NULL,
     price_per_kwh     DECIMAL(8, 2)  NOT NULL,
     state             SPOT_STATE     NOT NULL DEFAULT 'FREE'
@@ -49,12 +48,11 @@ CREATE TABLE session
 (
     id               SERIAL PRIMARY KEY,
     uuid             VARCHAR(255)      NOT NULL,
-    user_id          INTEGER REFERENCES user_table (id),
     vehicle_id       INTEGER REFERENCES vehicle (id),
     charging_spot_id INTEGER REFERENCES charging_spot (id),
     start_time       TIMESTAMP NOT NULL,
-    end_time         TIMESTAMP,
-    total_cost       DECIMAL(8, 2)      DEFAULT 0.00
+    duration         INTEGER NOT NULL DEFAULT 30,
+    total_cost       DECIMAL(8, 2)
 );
 
 CREATE TABLE payment
