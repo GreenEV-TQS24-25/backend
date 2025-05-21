@@ -45,17 +45,4 @@ public class ChargingStation {
     @Size(max = 255)
     @Column(name = "photo_url")
     private String photoUrl;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "station")
-    private List<ChargingSpot> chargingSpots;
-
-    public List<ConnectorType> getConnectorTypes(){
-        List<ConnectorType> connectorTypes = new ArrayList<>();
-        for (ChargingSpot chargingSpot : chargingSpots) {
-            connectorTypes.add(chargingSpot.getConnectorType());
-        }
-        return connectorTypes;
-    }
-
 }

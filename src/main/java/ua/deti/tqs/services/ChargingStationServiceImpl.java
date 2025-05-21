@@ -1,15 +1,22 @@
 package ua.deti.tqs.services;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.OneToMany;
+import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
+import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.UserRepository;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
@@ -21,6 +28,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   private static final String USER_NOT_OPERATOR_MESSAGE = "The user with id {} is not an operator";
   private final ChargingStationRepository chargingStationRepository;
   private final UserRepository userRepository;
+  private final ChargingSpotRepository chargingSpotRepository;
 
   @Override
   public List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId) {
@@ -174,12 +182,25 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     List<ChargingStation> filteredStations = List.copyOf(chargingStations);
     for (ChargingStation station : chargingStations) {
       for (ConnectorType connectorType : connectorTypes){
-        if (!station.getConnectorTypes().contains(connectorType)){
+        if (!getConnectorTypes(station).contains(connectorType)){
           filteredStations.remove(station);
           break;
         }
       }
     }
     return filteredStations;
+  }
+
+  private List<ConnectorType> getConnectorTypes(ChargingStation station){
+    
+    List<ConnectorType> connectorTypes = new ArrayList<>();
+    Optional<List<ChargingSpot>> chargingSpots = chargingSpotRepository.findAllByStation_Id(station.getId());
+    if (!chargingSpots.isPresent()){
+      return Collections.emptyList();
+    }
+    for (ChargingSpot chargingSpot : chargingSpots.get()) {
+      connectorTypes.add(chargingSpot.getConnectorType());
+    }
+    return connectorTypes;
   }
 }
