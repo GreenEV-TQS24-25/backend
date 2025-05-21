@@ -10,6 +10,7 @@ import ua.deti.tqs.repositories.UserTableRepository;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
@@ -44,7 +45,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     public List<ChargingStation> getFilteredChargingStations(List<Integer> operatorIds){
         log.debug("Fetching all charging stations with the selected filters");
         List<ChargingStation> chargingStations = chargingStationRepository.findAll();
-        List<ChargingStation> filteredChargingStations = Collections.emptyList();
+        List<ChargingStation> filteredChargingStations = new LinkedList<>();
         for (ChargingStation chargingStation : chargingStations) {
             for (int operatorId : operatorIds) {
                 if (operatorId == chargingStation.getOperator().getId()){

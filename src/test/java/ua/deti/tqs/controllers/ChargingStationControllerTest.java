@@ -183,4 +183,27 @@ class ChargingStationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void whenGetFilteredChargingStations_thenReturnStations() throws Exception {
+        int operatorId = 1;
+        List<Integer> operatorIds = List.of(1, 2);
+        when(chargingStationService.getFilteredChargingStations(operatorIds)).thenReturn(testStations);
+
+        mockMvc.perform(get("/" + Constants.API_V1 + "charging-stations/filtered?operatorIds=1&operatorIds=2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].operator.id", is(operatorId)));
+    }
+
+    @Test
+    void whenGetFilteredChargingStations_thenReturnEmptyList() throws Exception {
+        List<Integer> operatorIds = List.of(3, 4, 5);
+        when(chargingStationService.getFilteredChargingStations(operatorIds)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/" + Constants.API_V1 + "charging-stations/filtered?operatorIds=3&operatorIds=4&operatorIds=5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }

@@ -38,8 +38,10 @@ class ChargingStationServiceTest {
     private ChargingStationServiceImpl chargingStationService;
 
     private ChargingStation chargingStation1;
+    private ChargingStation chargingStation2;
 
     private UserTable operator1;
+    private UserTable operator2;
 
     @BeforeEach
     void setUp() {
@@ -51,10 +53,23 @@ class ChargingStationServiceTest {
         chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
         chargingStation1.setLastMaintenance(LocalDate.parse("2023-01-01"));
 
+        chargingStation2 = new ChargingStation();
+        chargingStation2.setId(2);
+        chargingStation2.setName("Charging Station 2");
+        chargingStation2.setLat(BigDecimal.valueOf(24.7128));
+        chargingStation2.setLon(BigDecimal.valueOf(111.0060));
+        chargingStation2.setPhotoUrl("https://example.com/photo.jpg");
+        chargingStation2.setLastMaintenance(LocalDate.parse("2023-01-01"));
+
         operator1 = new UserTable();
         operator1.setId(1);
         operator1.setRole(Role.OPERATOR);
         chargingStation1.setOperator(operator1);
+
+        operator2 = new UserTable();
+        operator2.setId(2);
+        operator2.setRole(Role.OPERATOR);
+        chargingStation2.setOperator(operator2);
 
     }
 
@@ -301,6 +316,33 @@ class ChargingStationServiceTest {
 
         assertThat(result).isFalse();
         verify(chargingStationRepository).findById(1);
+    }
+
+    @Test 
+    void whenGetFilteredChargingStations_withMultipleMatches_thenReturnList() {
+        List<ChargingStation> chargingStations = List.of(chargingStation1, chargingStation2);
+        List<Integer> operatorIds = List.of(1, 2);
+        when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+        List<ChargingStation> result = chargingStationService.getFilteredChargingStations(operatorIds);
+        assertThat(result).isEqualTo(chargingStations);
+    }
+
+    @Test 
+    void whenGetFilteredChargingStations_withMismatches_thenReturnList() {
+        List<ChargingStation> chargingStations = List.of(chargingStation1, chargingStation2);
+        List<Integer> operatorIds = List.of(1);
+        when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+        List<ChargingStation> result = chargingStationService.getFilteredChargingStations(operatorIds);
+        assertThat(result).isEqualTo(List.of(chargingStation1));
+    }
+
+    @Test 
+    void whenGetFilteredChargingStations_withNoMatches_thenReturnEmptyList() {
+        List<ChargingStation> chargingStations = List.of(chargingStation1, chargingStation2);
+        List<Integer> operatorIds = List.of(3, 4, 5);
+        when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+        List<ChargingStation> result = chargingStationService.getFilteredChargingStations(operatorIds);
+        assertThat(result).isEqualTo(List.of());
     }
 
 }
