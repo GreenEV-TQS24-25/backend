@@ -178,11 +178,8 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     List<ChargingStation> chargingStations = chargingStationRepository.findAll();
     List<ChargingStation> filteredStations = new ArrayList<>(chargingStations);
     for (ChargingStation station : chargingStations) {
-      for (ConnectorType connectorType : connectorTypes){
-        if (!getConnectorTypes(station).contains(connectorType)){
-          filteredStations.remove(station);
-          break;
-        }
+      if (!getConnectorTypes(station).containsAll(connectorTypes)){
+        filteredStations.remove(station);
       }
     }
     return filteredStations;

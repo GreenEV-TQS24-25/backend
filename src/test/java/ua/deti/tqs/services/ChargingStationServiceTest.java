@@ -59,8 +59,8 @@ class ChargingStationServiceTest {
     chargingStation2.setLon(BigDecimal.valueOf(-64.0060));
 
     chargingStation3 = new ChargingStation();
-    chargingStation3.setId(1);
-    chargingStation3.setName("Charging Station 1");
+    chargingStation3.setId(3);
+    chargingStation3.setName("Charging Station 3");
     chargingStation3.setLat(BigDecimal.valueOf(60.7128));
     chargingStation3.setLon(BigDecimal.valueOf(-54.0060));
 
