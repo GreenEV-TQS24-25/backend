@@ -20,7 +20,7 @@ public class Vehicle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserTable user;
+    private User user;
 
     @Size(max = 50)
     @NotNull
@@ -40,6 +40,6 @@ public class Vehicle {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
-    private ConnectorType connectorType;
+    private ConnectorType connectorType = ConnectorType.SAEJ1772;
 
 }

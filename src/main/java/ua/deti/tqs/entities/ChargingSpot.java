@@ -35,15 +35,14 @@ public class ChargingSpot {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "charging_velocity", columnDefinition = "sonic not null")
-    private Sonic chargingVelocity;
+    private Sonic chargingVelocity = Sonic.NORMAL;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "connector_type", columnDefinition = "connector_type not null")
-    private ConnectorType connectorType;
+    private ConnectorType connectorType = ConnectorType.SAEJ1772;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'FREE'")
     @Column(name = "state", columnDefinition = "spot_state not null")
-    private SpotState state;
+    private SpotState state = SpotState.FREE;
 
 }
