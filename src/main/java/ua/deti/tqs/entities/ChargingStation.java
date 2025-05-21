@@ -5,9 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import ua.deti.tqs.entities.types.ConnectorType;
+
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,5 +45,17 @@ public class ChargingStation {
     @Size(max = 255)
     @Column(name = "photo_url")
     private String photoUrl;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "chargingSpot")
+    private List<ChargingSpot> chargingSpots;
+
+    public List<ConnectorType> getConnectorTypes(){
+        List<ConnectorType> connectorTypes = new ArrayList<>();
+        for (ChargingSpot chargingSpot : chargingSpots) {
+            connectorTypes.add(chargingSpot.getConnectorType());
+        }
+        return connectorTypes;
+    }
 
 }

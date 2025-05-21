@@ -2,10 +2,13 @@ package ua.deti.tqs.services;
 
 import java.util.Collections;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import ua.deti.tqs.entities.ChargingStation;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.UserRepository;
@@ -163,5 +166,20 @@ public class ChargingStationServiceImpl implements ChargingStationService {
 
   private void logInvalidOperator(int operatorId) {
     log.debug(USER_NOT_OPERATOR_MESSAGE, operatorId);
+  }
+
+  @Override
+  public List<ChargingStation> filterChargingStations(List<ConnectorType> connectorTypes){
+    List<ChargingStation> chargingStations = chargingStationRepository.findAll();
+    List<ChargingStation> filteredStations = List.copyOf(chargingStations);
+    for (ChargingStation station : chargingStations) {
+      for (ConnectorType connectorType : connectorTypes){
+        if (!station.getConnectorTypes().contains(connectorType)){
+          filteredStations.remove(station);
+          break;
+        }
+      }
+    }
+    return filteredStations;
   }
 }

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.deti.tqs.entities.ChargingStation;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
 import ua.deti.tqs.utils.Constants;
 
@@ -122,5 +123,22 @@ public class ChargingStationController {
     }
     log.warn("ChargingStation not found");
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
+  @GetMapping(PUB_BASE_PATH + "/filter")
+  @Operation(summary = "Filter Charging Stations by Connector Type", description = "Fetches a fist of chargingStation with all specified connectorType.")
+  @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
+  @ApiResponse(responseCode = "404", description = "No chargingStation found")
+  public ResponseEntity<List<ChargingStation>> filterChargingStations(@RequestParam List<ConnectorType> connectorTypes) {
+    log.info("Fetching all chargingStation with the specified connectorType");
+
+    List<ChargingStation> chargingStation = chargingStationService.filterChargingStations(connectorTypes);
+
+    if (chargingStation.isEmpty()) {
+      log.warn("No chargingStation found");
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    log.info("ChargingStations retrieved successfully");
+    return new ResponseEntity<>(chargingStation, HttpStatus.OK);
   }
 }
