@@ -15,8 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
+
+import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.UserRepository;
@@ -32,6 +35,8 @@ class ChargingStationServiceTest {
   @InjectMocks private ChargingStationServiceImpl chargingStationService;
 
   private ChargingStation chargingStation1;
+  private ChargingStation chargingStation2;
+  private ChargingStation chargingStation3;
 
   private User operator1;
 
@@ -44,10 +49,24 @@ class ChargingStationServiceTest {
     chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
     chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
 
+    chargingStation2 = new ChargingStation();
+    chargingStation2.setId(2);
+    chargingStation2.setName("Charging Station 2");
+    chargingStation2.setLat(BigDecimal.valueOf(50.7128));
+    chargingStation2.setLon(BigDecimal.valueOf(-64.0060));
+
+    chargingStation3 = new ChargingStation();
+    chargingStation3.setId(1);
+    chargingStation3.setName("Charging Station 1");
+    chargingStation3.setLat(BigDecimal.valueOf(60.7128));
+    chargingStation3.setLon(BigDecimal.valueOf(-54.0060));
+
     operator1 = new User();
     operator1.setId(1);
     operator1.setRole(Role.OPERATOR);
     chargingStation1.setOperator(operator1);
+    chargingStation2.setOperator(operator1);
+    chargingStation3.setOperator(operator1);
   }
 
   @Test
@@ -643,5 +662,58 @@ class ChargingStationServiceTest {
 
     assertThat(result).isFalse();
     verify(chargingStationRepository).findById(1);
+  }
+
+  @Test
+  void whenFilterChargingStations_withMatches_stationsFound(){
+    ChargingSpot chargingSpot1;
+    ChargingSpot chargingSpot2;
+    ChargingSpot chargingSpot3;
+    ChargingSpot chargingSpot4;
+    ChargingSpot chargingSpot5;
+    ChargingSpot chargingSpot6;
+
+    chargingSpot1 = new ChargingSpot();
+    chargingSpot1.setId(1);
+    chargingSpot1.setStation(chargingStation1);
+    chargingSpot1.setConnectorType(ConnectorType.CCS);
+
+    chargingSpot2 = new ChargingSpot();
+    chargingSpot2.setId(2);
+    chargingSpot2.setStation(chargingStation1);
+    chargingSpot2.setConnectorType(ConnectorType.CHADEMO);
+
+    chargingSpot3 = new ChargingSpot();
+    chargingSpot3.setId(3);
+    chargingSpot3.setStation(chargingStation1);
+    chargingSpot3.setConnectorType(ConnectorType.SAEJ1772);
+
+    chargingSpot4 = new ChargingSpot();
+    chargingSpot4.setId(4);
+    chargingSpot4.setStation(chargingStation2);
+    chargingSpot4.setConnectorType(ConnectorType.CCS);
+
+    chargingSpot5 = new ChargingSpot();
+    chargingSpot5.setId(5);
+    chargingSpot5.setStation(chargingStation2);
+    chargingSpot5.setConnectorType(ConnectorType.MENNEKES);
+
+    chargingSpot6 = new ChargingSpot();
+    chargingSpot6.setId(6);
+    chargingSpot6.setStation(chargingStation3);
+    chargingSpot6.setConnectorType(ConnectorType.CHADEMO);
+
+    List<ChargingStation> chargingStations = List.of(chargingStation1, chargingStation2, chargingStation3);
+    List<ConnectorType> connectorTypes = List.of(ConnectorType.CCS, ConnectorType.CHADEMO);
+    when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+
+    List<ChargingStation> result = chargingStationService.filterChargingStations(connectorTypes);
+
+    assertThat(result).isEqualTo(List.of(chargingStation1));
+  }
+
+  @Test
+  void whenFilterChargingStations_withNoMatches_noStationsFound(){
+    
   }
 }

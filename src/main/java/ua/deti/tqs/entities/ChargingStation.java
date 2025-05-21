@@ -47,7 +47,7 @@ public class ChargingStation {
     private String photoUrl;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "chargingSpot")
+    @OneToMany(mappedBy = "station")
     private List<ChargingSpot> chargingSpots;
 
     public List<ConnectorType> getConnectorTypes(){
