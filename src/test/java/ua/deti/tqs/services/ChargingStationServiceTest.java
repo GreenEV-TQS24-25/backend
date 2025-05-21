@@ -668,7 +668,7 @@ class ChargingStationServiceTest {
   }
 
   @Test
-  void whenFilterChargingStations_withMatches_stationsFound(){
+  void whenFilterChargingStations_returnMatchingStations(){
     ChargingSpot chargingSpot1;
     ChargingSpot chargingSpot2;
     ChargingSpot chargingSpot3;
@@ -714,10 +714,5 @@ class ChargingStationServiceTest {
     List<ChargingStation> result = chargingStationService.filterChargingStations(connectorTypes);
 
     assertThat(result).isEqualTo(List.of(chargingStation1));
-  }
-
-  @Test
-  void whenFilterChargingStations_withNoMatches_noStationsFound(){
-    
   }
 }

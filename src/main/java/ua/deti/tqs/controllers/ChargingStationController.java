@@ -5,6 +5,8 @@ import static ua.deti.tqs.utils.SecurityUtils.getAuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -128,11 +130,20 @@ public class ChargingStationController {
   @GetMapping(PUB_BASE_PATH + "/filter")
   @Operation(summary = "Filter Charging Stations by Connector Type", description = "Fetches a fist of chargingStation with all specified connectorType.")
   @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
+  @ApiResponse(responseCode = "400", description = "Invalid connectorType")
   @ApiResponse(responseCode = "404", description = "No chargingStation found")
-  public ResponseEntity<List<ChargingStation>> filterChargingStations(@RequestParam List<ConnectorType> connectorTypes) {
+  public ResponseEntity<List<ChargingStation>> filterChargingStations(@RequestParam List<String> connectorTypes) {
     log.info("Fetching all chargingStation with the specified connectorType");
 
-    List<ChargingStation> chargingStation = chargingStationService.filterChargingStations(connectorTypes);
+    List<ConnectorType> _connectorTypes = new ArrayList<>();
+    for (String connectorType : connectorTypes) {
+      try {
+        _connectorTypes.add(ConnectorType.valueOf(connectorType.toUpperCase()));
+      } catch (Exception e) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+    }
+      List<ChargingStation> chargingStation = chargingStationService.filterChargingStations(_connectorTypes);
 
     if (chargingStation.isEmpty()) {
       log.warn("No chargingStation found");
@@ -140,5 +151,6 @@ public class ChargingStationController {
     }
     log.info("ChargingStations retrieved successfully");
     return new ResponseEntity<>(chargingStation, HttpStatus.OK);
+
   }
 }
