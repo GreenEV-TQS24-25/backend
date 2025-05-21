@@ -9,9 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.OneToMany;
 import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.types.ConnectorType;
@@ -179,7 +176,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   @Override
   public List<ChargingStation> filterChargingStations(List<ConnectorType> connectorTypes){
     List<ChargingStation> chargingStations = chargingStationRepository.findAll();
-    List<ChargingStation> filteredStations = List.copyOf(chargingStations);
+    List<ChargingStation> filteredStations = new ArrayList<>(chargingStations);
     for (ChargingStation station : chargingStations) {
       for (ConnectorType connectorType : connectorTypes){
         if (!getConnectorTypes(station).contains(connectorType)){
@@ -192,7 +189,6 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   }
 
   private List<ConnectorType> getConnectorTypes(ChargingStation station){
-    
     List<ConnectorType> connectorTypes = new ArrayList<>();
     Optional<List<ChargingSpot>> chargingSpots = chargingSpotRepository.findAllByStation_Id(station.getId());
     if (!chargingSpots.isPresent()){

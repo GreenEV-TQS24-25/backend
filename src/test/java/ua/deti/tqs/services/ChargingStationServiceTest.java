@@ -21,6 +21,7 @@ import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
+import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.UserRepository;
 
@@ -31,6 +32,8 @@ class ChargingStationServiceTest {
   @Mock private ChargingStationRepository chargingStationRepository;
 
   @Mock private UserRepository userRepository;
+
+  @Mock private ChargingSpotRepository chargingSpotRepository;
 
   @InjectMocks private ChargingStationServiceImpl chargingStationService;
 
@@ -675,37 +678,38 @@ class ChargingStationServiceTest {
 
     chargingSpot1 = new ChargingSpot();
     chargingSpot1.setId(1);
-    chargingSpot1.setStation(chargingStation1);
     chargingSpot1.setConnectorType(ConnectorType.CCS);
 
     chargingSpot2 = new ChargingSpot();
     chargingSpot2.setId(2);
-    chargingSpot2.setStation(chargingStation1);
     chargingSpot2.setConnectorType(ConnectorType.CHADEMO);
 
     chargingSpot3 = new ChargingSpot();
     chargingSpot3.setId(3);
-    chargingSpot3.setStation(chargingStation1);
     chargingSpot3.setConnectorType(ConnectorType.SAEJ1772);
 
     chargingSpot4 = new ChargingSpot();
     chargingSpot4.setId(4);
-    chargingSpot4.setStation(chargingStation2);
     chargingSpot4.setConnectorType(ConnectorType.CCS);
 
     chargingSpot5 = new ChargingSpot();
     chargingSpot5.setId(5);
-    chargingSpot5.setStation(chargingStation2);
     chargingSpot5.setConnectorType(ConnectorType.MENNEKES);
 
     chargingSpot6 = new ChargingSpot();
     chargingSpot6.setId(6);
-    chargingSpot6.setStation(chargingStation3);
     chargingSpot6.setConnectorType(ConnectorType.CHADEMO);
 
     List<ChargingStation> chargingStations = List.of(chargingStation1, chargingStation2, chargingStation3);
     List<ConnectorType> connectorTypes = List.of(ConnectorType.CCS, ConnectorType.CHADEMO);
+    List<ChargingSpot> chargingSpots1 = List.of(chargingSpot1, chargingSpot2, chargingSpot3);
+    List<ChargingSpot> chargingSpots2 = List.of(chargingSpot4, chargingSpot5);
+    List<ChargingSpot> chargingSpots3 = List.of(chargingSpot6);
+
     when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+    when(chargingSpotRepository.findAllByStation_Id(1)).thenReturn(Optional.of(chargingSpots1));
+    when(chargingSpotRepository.findAllByStation_Id(2)).thenReturn(Optional.of(chargingSpots2));
+    when(chargingSpotRepository.findAllByStation_Id(3)).thenReturn(Optional.of(chargingSpots3));
 
     List<ChargingStation> result = chargingStationService.filterChargingStations(connectorTypes);
 
