@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import ua.deti.tqs.dto.LoginRequest;
 import ua.deti.tqs.dto.LoginResponse;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
@@ -67,7 +66,7 @@ class ChargingStationIT {
                         .contentType(ContentType.JSON)
                         .body(body)
                         .when()
-                        .post("/api/v1/public/user-table")
+                        .post("/"+ Constants.API_V1 + "public/user-table")
                         .then()
                         .extract()
                         .jsonPath()

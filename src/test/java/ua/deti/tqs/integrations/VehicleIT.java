@@ -51,7 +51,7 @@ class VehicleIT {
             .contentType(ContentType.JSON)
             .body(body)
             .when()
-            .post("/api/v1/public/user-table")
+            .post("/" + Constants.API_V1 + "public/user-table")
             .then()
             .extract()
             .jsonPath()
@@ -92,9 +92,9 @@ class VehicleIT {
   @Test
   void whenCreateValidVehicle_ThenReturnCreatedVehicle() {
     Vehicle newVehicle = new Vehicle();
-    newVehicle.setBrand("Tesla");
+    newVehicle.setBrand("BRAND");
     newVehicle.setModel("Model S");
-    newVehicle.setLicensePlate("TESLA123");
+    newVehicle.setLicensePlate("BRAND123");
     newVehicle.setConnectorType(ConnectorType.CCS);
 
     given()
