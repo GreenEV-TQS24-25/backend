@@ -1,6 +1,7 @@
 package ua.deti.tqs.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,7 @@ public class Vehicle {
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonIgnore
   @JoinColumn(name = "user_id")
+  @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   private User user;
 
   @Size(max = 50)

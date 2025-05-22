@@ -1,5 +1,6 @@
 package ua.deti.tqs.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -24,10 +25,12 @@ public class Session {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "vehicle_id")
+  @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   private Vehicle vehicle;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "charging_spot_id")
+  @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   private ChargingSpot chargingSpot;
 
   @NotNull

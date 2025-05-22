@@ -1,5 +1,6 @@
 package ua.deti.tqs.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,6 +33,7 @@ public class ChargingStation {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "operator_id")
+  @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   private User operator;
 
   @Size(max = 255)

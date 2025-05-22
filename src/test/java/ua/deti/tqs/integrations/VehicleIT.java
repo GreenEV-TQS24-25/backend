@@ -2,7 +2,6 @@ package ua.deti.tqs.integrations;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
