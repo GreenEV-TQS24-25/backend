@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.Vehicle;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.VehicleRepository;
 
@@ -89,7 +90,21 @@ class VehicleServiceTest {
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
 
         // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user.getId());
+        Vehicle created = chargingStationService.createVehicle(vehicle, user);
+
+        // then
+        assertThat(created).isNotNull();
+        assertThat(created.getId()).isEqualTo(1);
+    }
+
+    @Test
+    void whenCreateVehicle_withNullConnector_thenReturnVehicle() {
+        // given
+        vehicle.setConnectorType(null);
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+
+        // when
+        Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
         // then
         assertThat(created).isNotNull();
@@ -99,7 +114,7 @@ class VehicleServiceTest {
     @Test
     void whenCreateVehicle_withInvalidUser_thenReturnNull() {
         // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user.getId());
+        Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
         // then
         assertThat(created).isNull();
@@ -114,7 +129,7 @@ class VehicleServiceTest {
         vehicle.setConnectorType(null);
 
         // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user.getId());
+        Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
         // then
         assertThat(created).isNull();
@@ -128,7 +143,7 @@ class VehicleServiceTest {
         vehicle.setLicensePlate("");
 
         // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user.getId());
+        Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
         // then
         assertThat(created).isNull();

@@ -52,7 +52,7 @@ public class VehicleController {
     int userId = getAuthenticatedUser().getId();
     log.info("Creating new vehicle {}", vehicle);
 
-    Vehicle newVehicle = vehicleService.createVehicle(vehicle, userId);
+    Vehicle newVehicle = vehicleService.createVehicle(vehicle, getAuthenticatedUser());
 
     if (newVehicle == null) {
       log.warn("No vehicle found for the user with id {}", userId);
@@ -66,7 +66,7 @@ public class VehicleController {
   @Operation(summary = "Update a Vehicle", description = "Updates a vehicle.")
   @ApiResponse(responseCode = "200", description = "Vehicle updated successfully")
   @ApiResponse(responseCode = "404", description = "No vehicle found")
-  public ResponseEntity<Vehicle> updateVehicle(Vehicle vehicle) {
+  public ResponseEntity<Vehicle> updateVehicle(@RequestBody Vehicle vehicle) {
     log.info("Updating vehicle {}", vehicle);
     int userId = getAuthenticatedUser().getId();
     Vehicle updatedVehicle = vehicleService.updateVehicle(userId, vehicle);

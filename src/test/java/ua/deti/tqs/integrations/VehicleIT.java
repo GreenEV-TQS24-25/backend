@@ -1,6 +1,7 @@
 package ua.deti.tqs.integrations;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import io.restassured.RestAssured;
@@ -79,11 +80,6 @@ class VehicleIT {
 
   @Test
   void whenGetAllVehiclesByUserId_ThenReturnListWithVehicles() {
-
-    //        try (MockedStatic<SecurityUtils> utilities = mockStatic(SecurityUtils.class)) {
-    //            utilities.when(SecurityUtils::getAuthenticatedUser).thenReturn(user);
-    System.out.println("JWT Token: " + jwtToken);
-
     given()
         .header("Authorization", "Bearer " + jwtToken)
         .when()
@@ -91,7 +87,73 @@ class VehicleIT {
         .then()
         .statusCode(200)
         .contentType(ContentType.JSON)
-        .body("", hasSize(1));
+        .body("[0].brand", equalTo(vehicle.getBrand()));
   }
-  //    }
+
+  @Test
+  void whenCreateValidVehicle_ThenReturnCreatedVehicle() {
+    Vehicle newVehicle = new Vehicle();
+    newVehicle.setBrand("Tesla");
+    newVehicle.setModel("Model S");
+    newVehicle.setLicensePlate("TESLA123");
+    newVehicle.setConnectorType(ConnectorType.CCS);
+
+    given()
+            .header("Authorization", "Bearer " + jwtToken)
+            .contentType(ContentType.JSON)
+            .body(newVehicle)
+            .when()
+            .post("/" + Constants.API_V1 + "private/vehicles")
+            .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("brand", equalTo(newVehicle.getBrand()))
+            .body("model", equalTo(newVehicle.getModel()))
+            .body("licensePlate", equalTo(newVehicle.getLicensePlate()))
+            .body("connectorType", equalTo(newVehicle.getConnectorType().name()));
+  }
+
+  @Test
+  void whenUpdateExistingVehicle_ThenReturnUpdatedVehicle() {
+
+    vehicle.setBrand("UpdatedBrand");
+    vehicle.setModel("UpdatedModel");
+    vehicle.setLicensePlate("UPDATED123");
+    vehicle.setId(vehicleRepository.findAllByUser_Id(user.getId()).orElseThrow().getFirst().getId());
+
+    given()
+            .header("Authorization", "Bearer " + jwtToken)
+            .contentType(ContentType.JSON)
+            .body(vehicle)
+            .when()
+            .put("/" + Constants.API_V1 + "private/vehicles")
+            .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("brand", equalTo(vehicle.getBrand()))
+            .body("model", equalTo(vehicle.getModel()))
+            .body("licensePlate", equalTo(vehicle.getLicensePlate()));
+  }
+
+  @Test
+  void whenDeleteExistingVehicle_ThenReturnOk() {
+    given()
+            .header("Authorization", "Bearer " + jwtToken)
+            .when()
+            .delete("/" + Constants.API_V1 + "private/vehicles/" + vehicle.getId())
+            .then()
+            .statusCode(200);
+  }
+
+  @Test
+  void whenDeleteNonExistingVehicle_ThenReturnNotFound() {
+    int invalidVehicleId = 9999;
+
+    given()
+            .header("Authorization", "Bearer " + jwtToken)
+            .when()
+            .delete("/" + Constants.API_V1 + "private/vehicles/" + invalidVehicleId)
+            .then()
+            .statusCode(404);
+  }
 }
