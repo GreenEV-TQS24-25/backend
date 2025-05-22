@@ -116,7 +116,7 @@ class VehicleControllerTest {
 
     @Test
     void whenCreateValidVehicle_thenReturnCreatedVehicle() throws Exception {
-        when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser.getId())))
+        when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser)))
                 .thenReturn(testVehicle);
 
         mockMvc.perform(post("/" + Constants.API_V1 + "private/vehicles")
@@ -128,7 +128,7 @@ class VehicleControllerTest {
 
     @Test
     void whenCreateInvalidVehicle_thenReturnBadRequest() throws Exception {
-        when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser.getId())))
+        when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser)))
                 .thenReturn(null);
 
         Vehicle invalidVehicle = new Vehicle();

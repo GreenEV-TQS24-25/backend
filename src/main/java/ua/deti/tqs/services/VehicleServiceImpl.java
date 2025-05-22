@@ -3,6 +3,7 @@ package ua.deti.tqs.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.Vehicle;
 import ua.deti.tqs.repositories.VehicleRepository;
 import ua.deti.tqs.services.interfaces.VehicleService;
@@ -31,7 +32,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public Vehicle createVehicle(Vehicle vehicle, int userId) {
+    public Vehicle createVehicle(Vehicle vehicle, User user) {
         log.debug("Creating new vehicle {}", vehicle);
 
         int errorCount = 0;
@@ -52,7 +53,7 @@ public class VehicleServiceImpl implements VehicleService {
 
 
         Vehicle newVehicle = new Vehicle();
-        newVehicle.setUser(vehicle.getUser());
+        newVehicle.setUser(user);
         newVehicle.setBrand(vehicle.getBrand());
         newVehicle.setModel(vehicle.getModel());
         newVehicle.setLicensePlate(vehicle.getLicensePlate());
