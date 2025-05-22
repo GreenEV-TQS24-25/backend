@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Sonic;
 import ua.deti.tqs.entities.types.SpotState;
@@ -14,6 +15,7 @@ import ua.deti.tqs.entities.types.SpotState;
 @Setter
 @Entity
 @Table(name = "charging_spot")
+@ToString
 public class ChargingSpot {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
