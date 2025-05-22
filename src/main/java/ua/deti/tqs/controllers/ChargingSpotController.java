@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import static ua.deti.tqs.utils.SecurityUtils.getAuthenticatedUserId;
 @RequestMapping(Constants.API_V1)
 @Tag(name = "Charging Spots", description = "The Charging Spots API")
 @AllArgsConstructor
+@ToString
 public class ChargingSpotController {
     private final ChargingSpotService chargingSpotService;
     private static final String PUB_BASE_PATH = "public/charging-spots";
