@@ -67,8 +67,8 @@ class VehicleIT {
     vehicle.setLicensePlate("ABC123");
     vehicle.setConnectorType(ConnectorType.SAEJ1772);
     vehicle.setUser(user);
-
     vehicleRepository.saveAndFlush(vehicle);
+    vehicle = vehicleRepository.findAllByUser_Id(user.getId()).orElseThrow().getFirst();
   }
 
   @AfterEach
