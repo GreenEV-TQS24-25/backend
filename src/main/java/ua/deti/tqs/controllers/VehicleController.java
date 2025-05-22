@@ -86,7 +86,7 @@ public class VehicleController {
     int userId = getAuthenticatedUser().getId();
     log.info("Deleting vehicle with id {}", vehicleId);
 
-    if (vehicleService.deleteVehicle(userId, vehicleId)) {
+    if (vehicleService.deleteVehicle(vehicleId, userId)) {
       log.info("Vehicle deleted successfully");
       return new ResponseEntity<>(HttpStatus.OK);
     }

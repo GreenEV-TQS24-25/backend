@@ -2,7 +2,6 @@ package ua.deti.tqs.integrations;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -52,7 +51,7 @@ class VehicleIT {
             .contentType(ContentType.JSON)
             .body(body)
             .when()
-            .post("/api/v1/public/user-table")
+            .post("/" + Constants.API_V1 + "public/user-table")
             .then()
             .extract()
             .jsonPath()
@@ -68,8 +67,8 @@ class VehicleIT {
     vehicle.setLicensePlate("ABC123");
     vehicle.setConnectorType(ConnectorType.SAEJ1772);
     vehicle.setUser(user);
-
     vehicleRepository.saveAndFlush(vehicle);
+    vehicle = vehicleRepository.findAllByUser_Id(user.getId()).orElseThrow().getFirst();
   }
 
   @AfterEach
@@ -93,9 +92,9 @@ class VehicleIT {
   @Test
   void whenCreateValidVehicle_ThenReturnCreatedVehicle() {
     Vehicle newVehicle = new Vehicle();
-    newVehicle.setBrand("Tesla");
+    newVehicle.setBrand("BRAND");
     newVehicle.setModel("Model S");
-    newVehicle.setLicensePlate("TESLA123");
+    newVehicle.setLicensePlate("BRAND123");
     newVehicle.setConnectorType(ConnectorType.CCS);
 
     given()

@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.Vehicle;
-import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.VehicleRepository;
 
