@@ -1,6 +1,13 @@
 package ua.deti.tqs.services;
 
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,15 +20,9 @@ import ua.deti.tqs.entities.Vehicle;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.VehicleRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
+@Requirement("GREEN-24")
 class VehicleServiceTest {
     @Mock private VehicleRepository vehicleRepository;
 
