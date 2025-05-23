@@ -44,8 +44,8 @@ class VehicleServiceTest {
     vehicle.setUser(user);
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenGetAllVehiclesByUserId_thenReturnVehicles() {
     // given
     when(vehicleRepository.findAllByUser_Id(user.getId()))
@@ -60,8 +60,8 @@ class VehicleServiceTest {
     assertThat(found.getFirst().getId()).isEqualTo(1);
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenGetAllVehiclesByUserId_thenReturnEmptyList() {
     // given
     when(vehicleRepository.findAllByUser_Id(user.getId())).thenReturn(Optional.empty());
@@ -74,8 +74,8 @@ class VehicleServiceTest {
     assertThat(found).isEmpty();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenGetAllVehiclesByUserId_thenReturnNull() {
     // when
     List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
@@ -85,8 +85,8 @@ class VehicleServiceTest {
     assertThat(found).isEmpty();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenCreateVehicle_thenReturnVehicle() {
     // given
     when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
@@ -99,8 +99,8 @@ class VehicleServiceTest {
     assertThat(created.getId()).isEqualTo(1);
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenCreateVehicle_withNullConnector_thenReturnVehicle() {
     // given
     vehicle.setConnectorType(null);
@@ -114,8 +114,8 @@ class VehicleServiceTest {
     assertThat(created.getId()).isEqualTo(1);
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenCreateVehicle_withInvalidUser_thenReturnNull() {
     // when
     Vehicle created = chargingStationService.createVehicle(vehicle, user);
@@ -124,8 +124,8 @@ class VehicleServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenCreateVehicle_withInvalidData_thenReturnNull() {
     // given
     vehicle.setBrand(null);
@@ -140,8 +140,8 @@ class VehicleServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenCreateVehicle_withEmptyData_thenReturnNull() {
     // given
     vehicle.setBrand("");
@@ -155,8 +155,8 @@ class VehicleServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenUpdateVehicle_thenReturnUpdatedVehicle() {
     // given
     when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
@@ -170,8 +170,8 @@ class VehicleServiceTest {
     assertThat(updated.getId()).isEqualTo(1);
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenUpdateVehicle_withWrongId_thenReturnNull() {
     // given
     when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
@@ -183,8 +183,8 @@ class VehicleServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenUpdateVehicle_withInvalidUser_thenReturnNull() {
     // when
     Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
@@ -193,8 +193,8 @@ class VehicleServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenUpdateVehicle_withInvalidData_thenReturnNull() {
     // given
     vehicle.setBrand(null);
@@ -211,8 +211,8 @@ class VehicleServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenUpdateVehicle_withEmptyData_thenReturnNull() {
     // given
     vehicle.setBrand("");
@@ -228,8 +228,8 @@ class VehicleServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenDeleteVehicle_thenReturnTrue() {
     // given
     when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
@@ -241,8 +241,8 @@ class VehicleServiceTest {
     assertThat(deleted).isTrue();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenDeleteVehicle_withInvalidUser_thenReturnFalse() {
     // when
     boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
@@ -251,8 +251,8 @@ class VehicleServiceTest {
     assertThat(deleted).isFalse();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenDeleteVehicle_withInvalidVehicle_thenReturnFalse() {
     // given
     when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.empty());
@@ -264,8 +264,8 @@ class VehicleServiceTest {
     assertThat(deleted).isFalse();
   }
 
-  @Requirement("GREEN-24")
   @Test
+  @Requirement("GREEN-24")
   void whenDeleteVehicle_withInvalidUserId_thenReturnFalse() {
     // given
     when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
