@@ -77,7 +77,7 @@ class SessionIT {
         user.setId(loginResponse.getId());
 
         vehicle = new Vehicle();
-        vehicle.setBrand("Tesla");
+        vehicle.setBrand("Brand");
         vehicle.setModel("Model 3");
         vehicle.setUser(user);
         vehicle.setLicensePlate("ABC123");
@@ -130,7 +130,7 @@ class SessionIT {
                 .then()
                 .statusCode(200)
                 .body("", hasSize(1))
-                .body("[0].vehicle.brand", equalTo("Tesla"))
+                .body("[0].vehicle.brand", equalTo("Brand"))
                 .body("[0].chargingSpot.powerKw", equalTo(150.00f));
     }
 
