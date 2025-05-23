@@ -128,7 +128,7 @@ public class ChargingStationController {
   }
 
   @GetMapping(PUB_BASE_PATH + "/filter")
-  @Operation(summary = "Filter Charging Stations by Connector Type", description = "Fetches a fist of chargingStation with all specified connectorType.")
+  @Operation(summary = "Filter Charging Stations by Connector Type", description = "Fetches a list of chargingStation with all specified connectorType.")
   @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
   @ApiResponse(responseCode = "400", description = "Invalid connectorType")
   @ApiResponse(responseCode = "404", description = "No chargingStation found")
