@@ -163,7 +163,10 @@ class SessionIT {
                 .then()
                 .statusCode(200)
                 .body("uuid", notNullValue())
-                .body("totalCost", equalTo(0.45f * 150f * (30 / 3600f)));
+                .body("totalCost", equalTo(new BigDecimal("0.45")
+                        .multiply(new BigDecimal("150"))
+                        .multiply(new BigDecimal("30"))
+                        .divide(new BigDecimal("3600"), RoundingMode.HALF_UP)));
     }
 
     @Test
