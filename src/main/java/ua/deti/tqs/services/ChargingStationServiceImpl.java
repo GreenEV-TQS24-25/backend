@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,6 @@ public class ChargingStationServiceImpl implements ChargingStationService {
 
   @Override
   public List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId) {
-    // need to grant that the operator is an operator
     if (!isOperator(operatorId)) {
       logInvalidOperator(operatorId);
       return Collections.emptyList();
@@ -110,7 +110,6 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   @Override
   public ChargingStation updateChargingStation(int operatorId, ChargingStation chargingStation) {
 
-    // need to grant that the operator is an operator
     if (!isOperator(operatorId)) {
       logInvalidOperator(operatorId);
       return null;
