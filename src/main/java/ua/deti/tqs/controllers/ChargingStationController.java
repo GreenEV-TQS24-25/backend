@@ -132,18 +132,18 @@ public class ChargingStationController {
   @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
   @ApiResponse(responseCode = "400", description = "Invalid connectorType")
   @ApiResponse(responseCode = "404", description = "No chargingStation found")
-  public ResponseEntity<List<ChargingStation>> filterChargingStations(@RequestParam List<String> connectorTypes) {
+  public ResponseEntity<List<ChargingStation>> filterChargingStations(@RequestParam List<String> connectorTypeInputs) {
     log.info("Fetching all chargingStation with the specified connectorType");
 
-    List<ConnectorType> _connectorTypes = new ArrayList<>();
-    for (String connectorType : connectorTypes) {
+    List<ConnectorType> connectorTypes = new ArrayList<>();
+    for (String connectorTypeInput : connectorTypeInputs) {
       try {
-        _connectorTypes.add(ConnectorType.valueOf(connectorType.toUpperCase()));
+        connectorTypes.add(ConnectorType.valueOf(connectorTypeInput.toUpperCase()));
       } catch (Exception e) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
     }
-      List<ChargingStation> chargingStation = chargingStationService.filterChargingStations(_connectorTypes);
+      List<ChargingStation> chargingStation = chargingStationService.filterChargingStations(connectorTypes);
 
     if (chargingStation.isEmpty()) {
       log.warn("No chargingStation found");

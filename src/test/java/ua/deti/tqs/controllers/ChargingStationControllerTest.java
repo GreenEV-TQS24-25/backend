@@ -238,7 +238,7 @@ class ChargingStationControllerTest {
     when(chargingStationService.filterChargingStations(connectorTypes)).thenReturn(testStations);
     mockMvc
         .perform(
-            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypes=ccs&connectorTypes=chademo")
+            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypeInputs=ccs&connectorTypeInputs=chademo")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
@@ -249,7 +249,7 @@ class ChargingStationControllerTest {
   void whenFilterChargingStations_withInvalidConnectorType_thenReturnBadRequest() throws Exception {
     mockMvc
         .perform(
-            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypes=ccs&connectorTypes=abc")
+            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypeInputs=ccs&connectorTypeInputs=abc")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
   }
@@ -259,7 +259,7 @@ class ChargingStationControllerTest {
     when(chargingStationService.filterChargingStations(anyList())).thenReturn(Collections.emptyList());
     mockMvc
         .perform(
-            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypes=mennekes")
+            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypeInputs=mennekes")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }

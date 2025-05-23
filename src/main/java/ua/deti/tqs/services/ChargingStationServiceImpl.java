@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,8 +174,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   @Override
   public List<ChargingStation> filterChargingStations(List<ConnectorType> connectorTypes){
     return chargingStationRepository.findAll().stream()
-        .filter(station -> getConnectorTypes(station).containsAll(connectorTypes))
-        .collect(Collectors.toList());
+        .filter(station -> getConnectorTypes(station).containsAll(connectorTypes)).toList();
   }
 
   private List<ConnectorType> getConnectorTypes(ChargingStation station){
