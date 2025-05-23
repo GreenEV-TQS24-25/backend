@@ -47,7 +47,6 @@ class ChargingStationIT {
         RestAssured.port = port;
         cleanDatabase();
 
-        // Create another operator
         anotherOperator = new User();
         anotherOperator.setName("Another Operator");
         anotherOperator.setEmail("another@example.com");
@@ -76,7 +75,6 @@ class ChargingStationIT {
 
         operator = userRepository.findById(userId).orElseThrow();
 
-        // Create test charging station
         testStation = new ChargingStation();
         testStation.setName("Main Station");
         testStation.setLat(new BigDecimal("38.711601"));
@@ -93,7 +91,6 @@ class ChargingStationIT {
 
     @Test
     void whenGetAllChargingStations_thenReturnAllStations() {
-        // Create additional station from different operator
         ChargingStation otherStation = new ChargingStation();
         otherStation.setName("Other Station");
         otherStation.setLat(new BigDecimal("38.720000"));
@@ -144,7 +141,7 @@ class ChargingStationIT {
 
     @Test
     void whenCreateInvalidStation_thenReturnBadRequest() {
-        ChargingStation invalidStation = new ChargingStation(); // Missing required fields
+        ChargingStation invalidStation = new ChargingStation();
 
         given()
                 .header("Authorization", "Bearer " + jwtToken)
@@ -175,7 +172,6 @@ class ChargingStationIT {
 
     @Test
     void whenUpdateUnauthorizedStation_thenReturnBadRequest() {
-        // Create station from different operator
         ChargingStation otherStation = new ChargingStation();
         otherStation.setName("Unauthorized Station");
         otherStation.setLat(new BigDecimal("38.720000"));
@@ -219,7 +215,6 @@ class ChargingStationIT {
 
     @Test
     void whenDeleteUnauthorizedStation_thenReturnNotFound() {
-        // Create station from different operator
         ChargingStation otherStation = new ChargingStation();
         otherStation.setName("Unauthorized Station");
         otherStation.setOperator(anotherOperator);

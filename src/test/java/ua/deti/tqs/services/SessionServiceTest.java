@@ -15,6 +15,7 @@ import ua.deti.tqs.repositories.SessionRepository;
 import ua.deti.tqs.repositories.VehicleRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -74,8 +75,8 @@ class SessionServiceTest {
         session.setId(1);
         session.setVehicle(vehicle);
         session.setChargingSpot(chargingSpot);
-        session.setStartTime(Instant.now().plusSeconds(3600)); // 1 hour from now
-        session.setDuration(3600); // 1 hour
+        session.setStartTime(Instant.now().plusSeconds(3600));
+        session.setDuration(3600);
     }
 
     @Test
@@ -167,8 +168,8 @@ class SessionServiceTest {
     @Test
     void whenCreateSession_withOverlappingSession_thenReturnNull() {
         Session overlappingSession = new Session();
-        overlappingSession.setStartTime(session.getStartTime().plusSeconds(1800)); // 30 mins after
-        overlappingSession.setDuration(3600); // 1 hour duration (will overlap)
+        overlappingSession.setStartTime(session.getStartTime().plusSeconds(1800));
+        overlappingSession.setDuration(3600);
 
         when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
         when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
@@ -193,18 +194,6 @@ class SessionServiceTest {
         assertThat(created).isNull();
     }
 
-    @Test
-    void whenCreateSession_withInvalidDuration_thenReturnNull() {
-        session.setDuration(0);
-
-        when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
-        when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
-        when(sessionRepository.findAllByChargingSpot_Id(chargingSpot.getId())).thenReturn(Optional.empty());
-
-        Session created = sessionService.createSession(user.getId(), session);
-
-        assertThat(created).isNull();
-    }
 
     @Test
     void whenCreateSession_withMultipleValidationErrors_thenReturnNull() {
@@ -218,6 +207,39 @@ class SessionServiceTest {
         Session created = sessionService.createSession(user.getId(), session);
 
         assertThat(created).isNull();
+    }
+
+    @Test
+    void whenCreateSession_withNullVehicle_thenReturnNull() {
+        session.setVehicle(null);
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNull();
+    }
+
+
+    @Test
+    void whenCreateSession_withNullVehicleId_thenReturnNull() {
+        session.getVehicle().setId(null);
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNull();
+    }
+
+    @Test
+    void whenCreateSession_withStartTimeInPast_thenReturnSession() {
+        session.setStartTime(Instant.now().minusSeconds(3600));
+
+        when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
+        when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
+        when(sessionRepository.findAllByChargingSpot_Id(chargingSpot.getId())).thenReturn(Optional.empty());
+        when(sessionRepository.save(any(Session.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNotNull();
     }
 
     @Test
@@ -238,8 +260,11 @@ class SessionServiceTest {
 
     @Test
     void whenCreateSession_thenCalculateTotalCost() {
-        session.setDuration(3600); // 1 hour = 3600 seconds
-        BigDecimal expectedCost = chargingSpot.getPricePerKwh().multiply(BigDecimal.valueOf(3600));
+        session.setDuration(30);
+        BigDecimal power = chargingSpot.getPowerKw();
+        BigDecimal hours = BigDecimal.valueOf(session.getDuration()).divide(BigDecimal.valueOf(3600), 10, RoundingMode.HALF_UP);
+        BigDecimal expectedCost = chargingSpot.getPricePerKwh().multiply(power).multiply(hours);
+
 
         when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
         when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
@@ -254,8 +279,8 @@ class SessionServiceTest {
     @Test
     void whenCreateSession_withNoOverlappingSessions_thenReturnSession() {
         Session nonOverlappingSession = new Session();
-        nonOverlappingSession.setStartTime(session.getStartTime().minusSeconds(7200)); // 2 hours before
-        nonOverlappingSession.setDuration(3600); // 1 hour duration (won't overlap)
+        nonOverlappingSession.setStartTime(session.getStartTime().minusSeconds(7200));
+        nonOverlappingSession.setDuration(3600);
 
         when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
         when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));

@@ -90,7 +90,7 @@ class UserIT {
 
     @Test
     void whenCreateInvalidUser_thenReturnBadRequest() {
-        User invalidUser = new User(); // Missing required fields
+        User invalidUser = new User();
 
         given()
                 .contentType(ContentType.JSON)
