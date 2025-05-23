@@ -3,6 +3,7 @@ package ua.deti.tqs.controllers;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.deti.tqs.components.AuthTokenFilter;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
 import ua.deti.tqs.services.interfaces.UserService;
@@ -226,6 +228,38 @@ class ChargingStationControllerTest {
     mockMvc
         .perform(
             delete("/" + Constants.API_V1 + "private/charging-stations/" + stationId)
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void whenFilterChargingStations_returnMatchingStations() throws Exception {
+    List<ConnectorType> connectorTypes = List.of(ConnectorType.CCS, ConnectorType.CHADEMO);
+    when(chargingStationService.filterChargingStations(connectorTypes)).thenReturn(testStations);
+    mockMvc
+        .perform(
+            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypeInputs=ccs&connectorTypeInputs=chademo")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].name", is(testStation.getName())));
+  }
+
+  @Test
+  void whenFilterChargingStations_withInvalidConnectorType_thenReturnBadRequest() throws Exception {
+    mockMvc
+        .perform(
+            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypeInputs=ccs&connectorTypeInputs=abc")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void whenFilterChargingStations_thenReturnEmptyList() throws Exception {
+    when(chargingStationService.filterChargingStations(anyList())).thenReturn(Collections.emptyList());
+    mockMvc
+        .perform(
+            get("/" + Constants.API_V1 + "public/charging-stations/filter?connectorTypeInputs=mennekes")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
