@@ -13,6 +13,7 @@ import ua.deti.tqs.repositories.VehicleRepository;
 import ua.deti.tqs.services.interfaces.SessionService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 
@@ -62,9 +63,13 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public Session createSession(int userId, Session session) {
         log.debug("Creating new session {}", session);
+        if (session.getVehicle() == null || session.getVehicle().getId() == null) {
+            log.debug("Invalid session vehicle, vehicle id is null");
+            return null;
+        }
         Vehicle vehicle = vehicleRepository.findById(session.getVehicle().getId()).orElse(null);
         if (vehicle == null) {
-            log.debug("Invalid session vehicle, vehicle with id {} not found", session.getVehicle().getId());
+            log.debug("Invalid vehicle");
             return null;
         } else if (vehicle.getUser().getId() != userId) {
             log.debug("Invalid session vehicle, user id {} does not match vehicle user id {}", userId, vehicle.getUser().getId());
@@ -112,8 +117,10 @@ public class SessionServiceImpl implements SessionService {
         newSession.setStartTime(session.getStartTime());
         newSession.setDuration(session.getDuration());
 
-        newSession.setTotalCost(chargingSpot.getPricePerKwh().multiply(BigDecimal.valueOf(session.getDuration())));
-
+        BigDecimal power = chargingSpot.getPowerKw();
+        BigDecimal hours = BigDecimal.valueOf(session.getDuration()).divide(BigDecimal.valueOf(3600), 10, RoundingMode.HALF_UP);
+        BigDecimal totalCost = chargingSpot.getPricePerKwh().multiply(power).multiply(hours);
+        newSession.setTotalCost(totalCost);
 
         return sessionRepository.save(newSession);
     }

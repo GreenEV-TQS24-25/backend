@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User createUser(User user) {
-    log.debug("Creating new user {}", user);
+    log.info("Creating new user {}", user);
     User newUser = new User();
 
     int errorCount = 0;

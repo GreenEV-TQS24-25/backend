@@ -74,7 +74,7 @@ public class ChargingSpotServiceImpl implements ChargingSpotService {
         }
 
         newChargingSpot.setStation(station);
-        newChargingSpot.setChargingVelocity(chargingSpot.getChargingVelocity());
+        newChargingSpot.setPowerKw(chargingSpot.getPowerKw());
         newChargingSpot.setPricePerKwh(chargingSpot.getPricePerKwh());
 
         if (chargingSpot.getConnectorType() != null)
