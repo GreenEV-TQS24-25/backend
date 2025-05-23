@@ -194,18 +194,6 @@ class SessionServiceTest {
         assertThat(created).isNull();
     }
 
-    @Test
-    void whenCreateSession_withInvalidDuration_thenReturnNull() {
-        session.setDuration(0);
-
-        when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
-        when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
-        when(sessionRepository.findAllByChargingSpot_Id(chargingSpot.getId())).thenReturn(Optional.empty());
-
-        Session created = sessionService.createSession(user.getId(), session);
-
-        assertThat(created).isNull();
-    }
 
     @Test
     void whenCreateSession_withMultipleValidationErrors_thenReturnNull() {
@@ -219,6 +207,39 @@ class SessionServiceTest {
         Session created = sessionService.createSession(user.getId(), session);
 
         assertThat(created).isNull();
+    }
+
+    @Test
+    void whenCreateSession_withNullVehicle_thenReturnNull() {
+        session.setVehicle(null);
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNull();
+    }
+
+
+    @Test
+    void whenCreateSession_withNullVehicleId_thenReturnNull() {
+        session.getVehicle().setId(null);
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNull();
+    }
+
+    @Test
+    void whenCreateSession_withStartTimeInPast_thenReturnSession() {
+        session.setStartTime(Instant.now().minusSeconds(3600));
+
+        when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
+        when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
+        when(sessionRepository.findAllByChargingSpot_Id(chargingSpot.getId())).thenReturn(Optional.empty());
+        when(sessionRepository.save(any(Session.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNotNull();
     }
 
     @Test

@@ -68,7 +68,7 @@ public class SessionServiceImpl implements SessionService {
             return null;
         }
         Vehicle vehicle = vehicleRepository.findById(session.getVehicle().getId()).orElse(null);
-        if (vehicle == null || vehicle.getId() == null) {
+        if (vehicle == null) {
             log.debug("Invalid vehicle");
             return null;
         } else if (vehicle.getUser().getId() != userId) {
