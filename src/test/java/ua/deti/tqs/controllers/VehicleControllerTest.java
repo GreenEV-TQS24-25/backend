@@ -39,150 +39,167 @@ import ua.deti.tqs.utils.SecurityUtils;
 @AutoConfigureMockMvc(addFilters = false)
 class VehicleControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private VehicleService vehicleService;
+  @MockitoBean private VehicleService vehicleService;
 
-    @MockitoBean
-    private AuthTokenFilter authTokenFilter;
+  @MockitoBean private AuthTokenFilter authTokenFilter;
 
-    @MockitoBean
-    private UserService userService;
+  @MockitoBean private UserService userService;
 
-    private MockedStatic<SecurityUtils> securityUtils;
+  private MockedStatic<SecurityUtils> securityUtils;
 
-    private Vehicle testVehicle;
-    private List<Vehicle> testVehicles;
-    private User testUser;
+  private Vehicle testVehicle;
+  private List<Vehicle> testVehicles;
+  private User testUser;
 
-    @BeforeEach
-    void setUp() {
-        testUser = new User();
-        testUser.setId(1);
-        testUser.setName("Test User");
-        testUser.setEmail("test@example.com");
-        testUser.setPassword("password");
-        testUser.setRole(Role.USER);
+  @BeforeEach
+  void setUp() {
+    testUser = new User();
+    testUser.setId(1);
+    testUser.setName("Test User");
+    testUser.setEmail("test@example.com");
+    testUser.setPassword("password");
+    testUser.setRole(Role.USER);
 
-        testVehicle = new Vehicle();
-        testVehicle.setId(1);
-        testVehicle.setLicensePlate("AB-12-CD");
-        testVehicle.setBrand("Tesla");
-        testVehicle.setModel("Model 3");
-        testVehicle.setUser(testUser);
+    testVehicle = new Vehicle();
+    testVehicle.setId(1);
+    testVehicle.setLicensePlate("AB-12-CD");
+    testVehicle.setBrand("Tesla");
+    testVehicle.setModel("Model 3");
+    testVehicle.setUser(testUser);
 
-        Vehicle testVehicle2 = new Vehicle();
-        testVehicle2.setId(2);
-        testVehicle2.setLicensePlate("EF-34-GH");
-        testVehicle2.setBrand("Nissan");
-        testVehicle2.setModel("Leaf");
-        testVehicle2.setUser(testUser);
+    Vehicle testVehicle2 = new Vehicle();
+    testVehicle2.setId(2);
+    testVehicle2.setLicensePlate("EF-34-GH");
+    testVehicle2.setBrand("Nissan");
+    testVehicle2.setModel("Leaf");
+    testVehicle2.setUser(testUser);
 
-        testVehicles = Arrays.asList(testVehicle, testVehicle2);
+    testVehicles = Arrays.asList(testVehicle, testVehicle2);
 
-        securityUtils = mockStatic(SecurityUtils.class);
-        securityUtils.when(SecurityUtils::getAuthenticatedUser).thenReturn(testUser);
-    }
+    securityUtils = mockStatic(SecurityUtils.class);
+    securityUtils.when(SecurityUtils::getAuthenticatedUser).thenReturn(testUser);
+  }
 
-    @AfterEach
-    void tearDown() {
-        securityUtils.close();
-    }
+  @AfterEach
+  void tearDown() {
+    securityUtils.close();
+  }
 
-    @Test
-    void whenGetAllVehiclesByUserId_thenReturnAllVehicles() throws Exception {
-        when(vehicleService.getAllVehiclesByUserId(testUser.getId())).thenReturn(testVehicles);
+  @Test
+  @Requirement("GREEN-24")
+  void whenGetAllVehiclesByUserId_thenReturnAllVehicles() throws Exception {
+    when(vehicleService.getAllVehiclesByUserId(testUser.getId())).thenReturn(testVehicles);
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "private/vehicles")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].licensePlate", is(testVehicle.getLicensePlate())));
-    }
+    mockMvc
+        .perform(
+            get("/" + Constants.API_V1 + "private/vehicles")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].licensePlate", is(testVehicle.getLicensePlate())));
+  }
 
-    @Test
-    void whenGetAllVehiclesByUserId_thenReturnNotFound() throws Exception {
-        when(vehicleService.getAllVehiclesByUserId(testUser.getId())).thenReturn(Collections.emptyList());
+  @Test
+  @Requirement("GREEN-24")
+  void whenGetAllVehiclesByUserId_thenReturnNotFound() throws Exception {
+    when(vehicleService.getAllVehiclesByUserId(testUser.getId()))
+        .thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/" + Constants.API_V1 + "private/vehicles")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc
+        .perform(
+            get("/" + Constants.API_V1 + "private/vehicles")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
+  }
 
-    @Test
-    void whenCreateValidVehicle_thenReturnCreatedVehicle() throws Exception {
-        when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser)))
-                .thenReturn(testVehicle);
+  @Test
+  @Requirement("GREEN-24")
+  void whenCreateValidVehicle_thenReturnCreatedVehicle() throws Exception {
+    when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser))).thenReturn(testVehicle);
 
-        mockMvc.perform(post("/" + Constants.API_V1 + "private/vehicles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testVehicle)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.licensePlate", is(testVehicle.getLicensePlate())));
-    }
+    mockMvc
+        .perform(
+            post("/" + Constants.API_V1 + "private/vehicles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testVehicle)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.licensePlate", is(testVehicle.getLicensePlate())));
+  }
 
-    @Test
-    void whenCreateInvalidVehicle_thenReturnBadRequest() throws Exception {
-        when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser)))
-                .thenReturn(null);
+  @Test
+  @Requirement("GREEN-24")
+  void whenCreateInvalidVehicle_thenReturnBadRequest() throws Exception {
+    when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser))).thenReturn(null);
 
-        Vehicle invalidVehicle = new Vehicle();
-        invalidVehicle.setLicensePlate(""); // Invalid license plate
+    Vehicle invalidVehicle = new Vehicle();
+    invalidVehicle.setLicensePlate(""); // Invalid license plate
 
-        mockMvc.perform(post("/" + Constants.API_V1 + "private/vehicles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidVehicle)))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc
+        .perform(
+            post("/" + Constants.API_V1 + "private/vehicles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidVehicle)))
+        .andExpect(status().isNotFound());
+  }
 
-    @Test
-    void whenUpdateValidVehicle_thenReturnUpdatedVehicle() throws Exception {
-        when(vehicleService.updateVehicle(eq(testUser.getId()), any(Vehicle.class)))
-                .thenReturn(testVehicle);
+  @Test
+  @Requirement("GREEN-24")
+  void whenUpdateValidVehicle_thenReturnUpdatedVehicle() throws Exception {
+    when(vehicleService.updateVehicle(eq(testUser.getId()), any(Vehicle.class)))
+        .thenReturn(testVehicle);
 
-        mockMvc.perform(put("/" + Constants.API_V1 + "private/vehicles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testVehicle)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.licensePlate", is(testVehicle.getLicensePlate())));
-    }
+    mockMvc
+        .perform(
+            put("/" + Constants.API_V1 + "private/vehicles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testVehicle)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.licensePlate", is(testVehicle.getLicensePlate())));
+  }
 
-    @Test
-    void whenUpdateInvalidVehicle_thenReturnNotFound() throws Exception {
-        when(vehicleService.updateVehicle(eq(testUser.getId()), any(Vehicle.class)))
-                .thenReturn(null);
+  @Test
+  @Requirement("GREEN-24")
+  void whenUpdateInvalidVehicle_thenReturnNotFound() throws Exception {
+    when(vehicleService.updateVehicle(eq(testUser.getId()), any(Vehicle.class))).thenReturn(null);
 
-        Vehicle invalidVehicle = new Vehicle();
-        invalidVehicle.setLicensePlate(""); // Invalid license plate
+    Vehicle invalidVehicle = new Vehicle();
+    invalidVehicle.setLicensePlate(""); // Invalid license plate
 
-        mockMvc.perform(put("/" + Constants.API_V1 + "private/vehicles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidVehicle)))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc
+        .perform(
+            put("/" + Constants.API_V1 + "private/vehicles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidVehicle)))
+        .andExpect(status().isNotFound());
+  }
 
-    @Test
-    void whenDeleteExistingVehicle_thenReturnOk() throws Exception {
-        int vehicleId = 1;
-        when(vehicleService.deleteVehicle(vehicleId, testUser.getId())).thenReturn(true);
+  @Test
+  @Requirement("GREEN-24")
+  void whenDeleteExistingVehicle_thenReturnOk() throws Exception {
+    int vehicleId = 1;
+    when(vehicleService.deleteVehicle(vehicleId, testUser.getId())).thenReturn(true);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "private/vehicles/" + vehicleId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
+    mockMvc
+        .perform(
+            delete("/" + Constants.API_V1 + "private/vehicles/" + vehicleId)
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void whenDeleteNonExistingVehicle_thenReturnNotFound() throws Exception {
-        int vehicleId = 99;
-        when(vehicleService.deleteVehicle(vehicleId, testUser.getId())).thenReturn(false);
+  @Test
+  @Requirement("GREEN-24")
+  void whenDeleteNonExistingVehicle_thenReturnNotFound() throws Exception {
+    int vehicleId = 99;
+    when(vehicleService.deleteVehicle(vehicleId, testUser.getId())).thenReturn(false);
 
-        mockMvc.perform(delete("/" + Constants.API_V1 + "private/vehicles/" + vehicleId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc
+        .perform(
+            delete("/" + Constants.API_V1 + "private/vehicles/" + vehicleId)
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
+  }
 }

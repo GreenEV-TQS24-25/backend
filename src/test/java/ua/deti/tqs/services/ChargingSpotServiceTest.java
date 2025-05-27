@@ -1,5 +1,13 @@
 package ua.deti.tqs.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,265 +22,279 @@ import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class ChargingSpotServiceTest {
 
-    @Mock
-    private ChargingStationRepository chargingStationRepository;
+  @Mock private ChargingStationRepository chargingStationRepository;
+
+  @Mock private ChargingSpotRepository chargingSpotRepository;
 
-    @Mock
-    private ChargingSpotRepository chargingSpotRepository;
+  @InjectMocks private ChargingSpotServiceImpl chargingSpotService;
+
+  private ChargingStation chargingStation1;
+
+  private ChargingSpot chargingSpot;
+
+  private User operator1;
 
-    @InjectMocks
-    private ChargingSpotServiceImpl chargingSpotService;
+  @BeforeEach
+  void setUp() {
+    chargingStation1 = new ChargingStation();
+    chargingStation1.setId(1);
+    chargingStation1.setName("Charging Station 1");
+    chargingStation1.setLat(BigDecimal.valueOf(40.7128));
+    chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
+    chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
 
-    private ChargingStation chargingStation1;
+    operator1 = new User();
+    operator1.setId(1);
+    operator1.setRole(Role.OPERATOR);
+    chargingStation1.setOperator(operator1);
 
-    private ChargingSpot chargingSpot;
+    chargingSpot = new ChargingSpot();
+    chargingSpot.setId(1);
+    chargingSpot.setStation(chargingStation1);
+    chargingSpot.setPowerKw(BigDecimal.valueOf(50));
+    chargingSpot.setPricePerKwh(BigDecimal.valueOf(0.5));
+  }
 
-    private User operator1;
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenGetAllChargingSpotsByStationId_thenReturnChargingSpots() {
+    when(chargingSpotRepository.findAllByStation_Id(chargingStation1.getId()))
+        .thenReturn(Optional.of(List.of(chargingSpot)));
 
-    @BeforeEach
-    void setUp() {
-        chargingStation1 = new ChargingStation();
-        chargingStation1.setId(1);
-        chargingStation1.setName("Charging Station 1");
-        chargingStation1.setLat(BigDecimal.valueOf(40.7128));
-        chargingStation1.setLon(BigDecimal.valueOf(-74.0060));
-        chargingStation1.setPhotoUrl("https://example.com/photo.jpg");
+    List<ChargingSpot> found =
+        chargingSpotService.getAllChargingSpotsByStationId(chargingStation1.getId());
 
-        operator1 = new User();
-        operator1.setId(1);
-        operator1.setRole(Role.OPERATOR);
-        chargingStation1.setOperator(operator1);
+    assertThat(found).isNotEmpty();
+    assertThat(found.getFirst().getId()).isEqualTo(chargingSpot.getId());
+    assertThat(found.getFirst().getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
+    assertThat(found.getFirst().getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
-        chargingSpot = new ChargingSpot();
-        chargingSpot.setId(1);
-        chargingSpot.setStation(chargingStation1);
-        chargingSpot.setPowerKw(BigDecimal.valueOf(50));
-        chargingSpot.setPricePerKwh(BigDecimal.valueOf(0.5));
-    }
+    verify(chargingSpotRepository).findAllByStation_Id(chargingStation1.getId());
+  }
 
-    @Test
-    void whenGetAllChargingSpotsByStationId_thenReturnChargingSpots() {
-        when(chargingSpotRepository.findAllByStation_Id(chargingStation1.getId())).thenReturn(Optional.of(List.of(chargingSpot)));
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenGetAllChargingSpotsByStationId_withInvalidId_thenReturnEmptyList() {
+    when(chargingSpotRepository.findAllByStation_Id(999)).thenReturn(Optional.empty());
 
-        List<ChargingSpot> found = chargingSpotService.getAllChargingSpotsByStationId(chargingStation1.getId());
+    List<ChargingSpot> found = chargingSpotService.getAllChargingSpotsByStationId(999);
 
-        assertThat(found).isNotEmpty();
-        assertThat(found.getFirst().getId()).isEqualTo(chargingSpot.getId());
-        assertThat(found.getFirst().getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
-        assertThat(found.getFirst().getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
+    assertThat(found).isEmpty();
 
-        verify(chargingSpotRepository).findAllByStation_Id(chargingStation1.getId());
-    }
+    verify(chargingSpotRepository).findAllByStation_Id(999);
+  }
 
-    @Test
-    void whenGetAllChargingSpotsByStationId_withInvalidId_thenReturnEmptyList() {
-        when(chargingSpotRepository.findAllByStation_Id(999)).thenReturn(Optional.empty());
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenCreateChargingSpot_thenReturnCreatedChargingSpot() {
+    when(chargingStationRepository.findById(chargingStation1.getId()))
+        .thenReturn(Optional.of(chargingStation1));
+    when(chargingSpotRepository.save(any(ChargingSpot.class))).thenReturn(chargingSpot);
 
-        List<ChargingSpot> found = chargingSpotService.getAllChargingSpotsByStationId(999);
+    ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
 
-        assertThat(found).isEmpty();
+    assertThat(created).isNotNull();
+    assertThat(created.getId()).isEqualTo(chargingSpot.getId());
+    assertThat(created.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
+    assertThat(created.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
-        verify(chargingSpotRepository).findAllByStation_Id(999);
-    }
+    verify(chargingStationRepository).findById(chargingStation1.getId());
+    verify(chargingSpotRepository).save(any(ChargingSpot.class));
+  }
 
-    @Test
-    void whenCreateChargingSpot_thenReturnCreatedChargingSpot() {
-        when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.of(chargingStation1));
-        when(chargingSpotRepository.save(any(ChargingSpot.class))).thenReturn(chargingSpot);
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenCreateChargingSpot_withPartialData_thenReturnCreatedChargingSpot() {
+    when(chargingStationRepository.findById(chargingStation1.getId()))
+        .thenReturn(Optional.of(chargingStation1));
+    when(chargingSpotRepository.save(any(ChargingSpot.class))).thenReturn(chargingSpot);
 
-        ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
+    chargingSpot.setConnectorType(null);
+    chargingSpot.setState(null);
+    chargingSpot.setChargingVelocity(null);
 
-        assertThat(created).isNotNull();
-        assertThat(created.getId()).isEqualTo(chargingSpot.getId());
-        assertThat(created.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
-        assertThat(created.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
+    ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
 
-        verify(chargingStationRepository).findById(chargingStation1.getId());
-        verify(chargingSpotRepository).save(any(ChargingSpot.class));
-    }
+    assertThat(created).isNotNull();
+    assertThat(created.getId()).isEqualTo(chargingSpot.getId());
+    assertThat(created.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
+    assertThat(created.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
-    @Test
-    void whenCreateChargingSpot_withPartialData_thenReturnCreatedChargingSpot() {
-        when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.of(chargingStation1));
-        when(chargingSpotRepository.save(any(ChargingSpot.class))).thenReturn(chargingSpot);
+    verify(chargingStationRepository).findById(chargingStation1.getId());
+    verify(chargingSpotRepository).save(any(ChargingSpot.class));
+  }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenCreateChargingSpot_withIncompleteData_thenReturnNull() {
+    when(chargingStationRepository.findById(chargingStation1.getId()))
+        .thenReturn(Optional.of(chargingStation1));
 
-        chargingSpot.setConnectorType(null);
-        chargingSpot.setState(null);
-        chargingSpot.setChargingVelocity(null);
+    chargingSpot.setPowerKw(null);
+    chargingSpot.setPricePerKwh(null);
 
-        ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
+    ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
 
-        assertThat(created).isNotNull();
-        assertThat(created.getId()).isEqualTo(chargingSpot.getId());
-        assertThat(created.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
-        assertThat(created.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
+    assertThat(created).isNull();
 
-        verify(chargingStationRepository).findById(chargingStation1.getId());
-        verify(chargingSpotRepository).save(any(ChargingSpot.class));
+    verify(chargingStationRepository).findById(chargingStation1.getId());
+  }
 
-    }
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenCreateChargingSpot_withInvalidStation_thenReturnNull() {
+    when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.empty());
 
-    @Test
-    void whenCreateChargingSpot_withIncompleteData_thenReturnNull() {
-        when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.of(chargingStation1));
+    ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
 
-        chargingSpot.setPowerKw(null);
-        chargingSpot.setPricePerKwh(null);
+    assertThat(created).isNull();
 
-        ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
+    verify(chargingStationRepository).findById(chargingStation1.getId());
+  }
 
-        assertThat(created).isNull();
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenCreateChargingSpot_withoutStation_thenReturnNull() {
+    chargingSpot.setStation(null);
 
-        verify(chargingStationRepository).findById(chargingStation1.getId());
-    }
+    ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
 
-    @Test
-    void whenCreateChargingSpot_withInvalidStation_thenReturnNull() {
-        when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.empty());
+    assertThat(created).isNull();
+  }
 
-        ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenCreateChargingSpot_withInvalidOperator_thenReturnNull() {
+    when(chargingStationRepository.findById(chargingStation1.getId()))
+        .thenReturn(Optional.of(chargingStation1));
 
-        assertThat(created).isNull();
+    ChargingSpot created = chargingSpotService.createChargingSpot(999, chargingSpot);
 
-        verify(chargingStationRepository).findById(chargingStation1.getId());
-    }
+    assertThat(created).isNull();
 
-    @Test
-    void whenCreateChargingSpot_withoutStation_thenReturnNull() {
-        chargingSpot.setStation(null);
+    verify(chargingStationRepository).findById(chargingStation1.getId());
+  }
 
-        ChargingSpot created = chargingSpotService.createChargingSpot(operator1.getId(), chargingSpot);
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenUpdateChargingSpot_thenReturnUpdatedChargingSpot() {
+    when(chargingSpotRepository.findById(chargingSpot.getId()))
+        .thenReturn(Optional.of(chargingSpot));
+    when(chargingSpotRepository.save(chargingSpot)).thenReturn(chargingSpot);
 
-        assertThat(created).isNull();
-    }
+    ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), chargingSpot);
 
-    @Test
-    void whenCreateChargingSpot_withInvalidOperator_thenReturnNull() {
-        when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.of(chargingStation1));
+    assertThat(updated).isNotNull();
+    assertThat(updated.getId()).isEqualTo(chargingSpot.getId());
+    assertThat(updated.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
+    assertThat(updated.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
-        ChargingSpot created = chargingSpotService.createChargingSpot(999, chargingSpot);
+    verify(chargingSpotRepository).findById(chargingSpot.getId());
+    verify(chargingSpotRepository).save(chargingSpot);
+  }
 
-        assertThat(created).isNull();
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenUpdateChargingSpot_withPartialData_thenReturnUpdatedChargingSpot() {
+    when(chargingSpotRepository.findById(chargingSpot.getId()))
+        .thenReturn(Optional.of(chargingSpot));
+    when(chargingSpotRepository.save(chargingSpot)).thenReturn(chargingSpot);
 
-        verify(chargingStationRepository).findById(chargingStation1.getId());
-    }
+    ChargingSpot toUpdate = new ChargingSpot();
+    toUpdate.setId(chargingSpot.getId());
+    toUpdate.setStation(chargingStation1);
+    toUpdate.setPowerKw(null);
+    toUpdate.setPricePerKwh(null);
+    toUpdate.setConnectorType(null);
+    toUpdate.setState(null);
+    toUpdate.setChargingVelocity(null);
 
-    @Test
-    void whenUpdateChargingSpot_thenReturnUpdatedChargingSpot() {
-        when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
-        when(chargingSpotRepository.save(chargingSpot)).thenReturn(chargingSpot);
+    ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), toUpdate);
 
-        ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), chargingSpot);
+    assertThat(updated).isNotNull();
+    assertThat(updated.getId()).isEqualTo(chargingSpot.getId());
+    assertThat(updated.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
+    assertThat(updated.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
 
-        assertThat(updated).isNotNull();
-        assertThat(updated.getId()).isEqualTo(chargingSpot.getId());
-        assertThat(updated.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
-        assertThat(updated.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
+    verify(chargingSpotRepository).findById(chargingSpot.getId());
+    verify(chargingSpotRepository).save(chargingSpot);
+  }
 
-        verify(chargingSpotRepository).findById(chargingSpot.getId());
-        verify(chargingSpotRepository).save(chargingSpot);
-    }
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenUpdateChargingSpot_withInvalidId_thenReturnNull() {
+    when(chargingSpotRepository.findById(operator1.getId())).thenReturn(Optional.empty());
 
-    @Test
-    void whenUpdateChargingSpot_withPartialData_thenReturnUpdatedChargingSpot() {
-        when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
-        when(chargingSpotRepository.save(chargingSpot)).thenReturn(chargingSpot);
+    ChargingSpot updated = chargingSpotService.updateChargingSpot(999, chargingSpot);
 
-        ChargingSpot toUpdate = new ChargingSpot();
-        toUpdate.setId(chargingSpot.getId());
-        toUpdate.setStation(chargingStation1);
-        toUpdate.setPowerKw(null);
-        toUpdate.setPricePerKwh(null);
-        toUpdate.setConnectorType(null);
-        toUpdate.setState(null);
-        toUpdate.setChargingVelocity(null);
+    assertThat(updated).isNull();
 
-        ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), toUpdate);
+    verify(chargingSpotRepository).findById(operator1.getId());
+  }
 
-        assertThat(updated).isNotNull();
-        assertThat(updated.getId()).isEqualTo(chargingSpot.getId());
-        assertThat(updated.getPowerKw()).isEqualTo(chargingSpot.getPowerKw());
-        assertThat(updated.getPricePerKwh()).isEqualTo(chargingSpot.getPricePerKwh());
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenUpdateChargingSpot_withInvalidOperator_thenReturnNull() {
+    when(chargingSpotRepository.findById(chargingSpot.getId()))
+        .thenReturn(Optional.of(chargingSpot));
 
-        verify(chargingSpotRepository).findById(chargingSpot.getId());
-        verify(chargingSpotRepository).save(chargingSpot);
-    }
+    chargingSpot.setStation(new ChargingStation());
+    chargingSpot.getStation().setOperator(new User());
+    chargingSpot.getStation().getOperator().setId(999);
 
-    @Test
-    void whenUpdateChargingSpot_withInvalidId_thenReturnNull() {
-        when(chargingSpotRepository.findById(operator1.getId())).thenReturn(Optional.empty());
+    ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), chargingSpot);
 
-        ChargingSpot updated = chargingSpotService.updateChargingSpot(999, chargingSpot);
+    assertThat(updated).isNull();
 
-        assertThat(updated).isNull();
+    verify(chargingSpotRepository).findById(chargingSpot.getId());
+  }
 
-        verify(chargingSpotRepository).findById(operator1.getId());
-    }
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenDeleteChargingSpot_thenReturnTrue() {
+    when(chargingSpotRepository.findById(chargingSpot.getId()))
+        .thenReturn(Optional.of(chargingSpot));
 
-    @Test
-    void whenUpdateChargingSpot_withInvalidOperator_thenReturnNull() {
-        when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
+    boolean deleted =
+        chargingSpotService.deleteChargingSpot(chargingSpot.getId(), operator1.getId());
 
-        chargingSpot.setStation(new ChargingStation());
-        chargingSpot.getStation().setOperator(new User());
-        chargingSpot.getStation().getOperator().setId(999);
+    assertThat(deleted).isTrue();
 
-        ChargingSpot updated = chargingSpotService.updateChargingSpot(operator1.getId(), chargingSpot);
+    verify(chargingSpotRepository).findById(chargingSpot.getId());
+    verify(chargingSpotRepository).delete(chargingSpot);
+  }
 
-        assertThat(updated).isNull();
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenDeleteChargingSpot_withInvalidId_thenReturnFalse() {
+    when(chargingSpotRepository.findById(999)).thenReturn(Optional.empty());
 
-        verify(chargingSpotRepository).findById(chargingSpot.getId());
-    }
+    boolean deleted = chargingSpotService.deleteChargingSpot(999, operator1.getId());
 
-    @Test
-    void whenDeleteChargingSpot_thenReturnTrue() {
-        when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
+    assertThat(deleted).isFalse();
 
-        boolean deleted = chargingSpotService.deleteChargingSpot(chargingSpot.getId(), operator1.getId());
+    verify(chargingSpotRepository).findById(999);
+  }
 
-        assertThat(deleted).isTrue();
+  @Requirement({"GREEN-24", "GREEN-21"})
+  @Test
+  void whenDeleteChargingSpot_withInvalidOperator_thenReturnFalse() {
+    when(chargingSpotRepository.findById(chargingSpot.getId()))
+        .thenReturn(Optional.of(chargingSpot));
 
-        verify(chargingSpotRepository).findById(chargingSpot.getId());
-        verify(chargingSpotRepository).delete(chargingSpot);
-    }
+    chargingSpot.setStation(new ChargingStation());
+    chargingSpot.getStation().setOperator(new User());
+    chargingSpot.getStation().getOperator().setId(999);
 
-    @Test
-    void whenDeleteChargingSpot_withInvalidId_thenReturnFalse() {
-        when(chargingSpotRepository.findById(999)).thenReturn(Optional.empty());
+    boolean deleted =
+        chargingSpotService.deleteChargingSpot(chargingSpot.getId(), operator1.getId());
 
-        boolean deleted = chargingSpotService.deleteChargingSpot(999, operator1.getId());
+    assertThat(deleted).isFalse();
 
-        assertThat(deleted).isFalse();
-
-        verify(chargingSpotRepository).findById(999);
-    }
-
-    @Test
-    void whenDeleteChargingSpot_withInvalidOperator_thenReturnFalse() {
-        when(chargingSpotRepository.findById(chargingSpot.getId())).thenReturn(Optional.of(chargingSpot));
-
-        chargingSpot.setStation(new ChargingStation());
-        chargingSpot.getStation().setOperator(new User());
-        chargingSpot.getStation().getOperator().setId(999);
-
-        boolean deleted = chargingSpotService.deleteChargingSpot(chargingSpot.getId(), operator1.getId());
-
-        assertThat(deleted).isFalse();
-
-        verify(chargingSpotRepository).findById(chargingSpot.getId());
-    }
+    verify(chargingSpotRepository).findById(chargingSpot.getId());
+  }
 }

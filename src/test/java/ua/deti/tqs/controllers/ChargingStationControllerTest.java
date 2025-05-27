@@ -89,6 +89,7 @@ class ChargingStationControllerTest {
     securityUtils.close();
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStations_thenReturnAllStations() throws Exception {
     when(chargingStationService.getAllChargingStations()).thenReturn(testStations);
@@ -102,6 +103,7 @@ class ChargingStationControllerTest {
         .andExpect(jsonPath("$[0].name", is(testStation.getName())));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStations_thenReturnEmptyList() throws Exception {
     when(chargingStationService.getAllChargingStations()).thenReturn(Collections.emptyList());
@@ -113,6 +115,7 @@ class ChargingStationControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStationsByOperatorId_thenReturnStations() throws Exception {
     int operatorId = 1;
@@ -128,6 +131,7 @@ class ChargingStationControllerTest {
         .andExpect(jsonPath("$[0].operator.id", is(operatorId)));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStationsByOperatorId_thenReturnNotFound() throws Exception {
     int operatorId = 99;
@@ -141,6 +145,7 @@ class ChargingStationControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_thenReturnCreatedStation() throws Exception {
     when(chargingStationService.createChargingStation(
@@ -156,6 +161,7 @@ class ChargingStationControllerTest {
         .andExpect(jsonPath("$.name", is(testStation.getName())));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateInvalidChargingStation_thenReturnBadRequest() throws Exception {
     when(chargingStationService.createChargingStation(
@@ -173,6 +179,7 @@ class ChargingStationControllerTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStation_thenReturnUpdatedStation() throws Exception {
     int operatorId = 1;
@@ -188,6 +195,7 @@ class ChargingStationControllerTest {
         .andExpect(jsonPath("$.name", is(testStation.getName())));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateInvalidChargingStation_thenReturnBadRequest() throws Exception {
     int operatorId = 1;
@@ -205,6 +213,7 @@ class ChargingStationControllerTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteExistingChargingStation_thenReturnOk() throws Exception {
     int stationId = 1;
@@ -218,6 +227,7 @@ class ChargingStationControllerTest {
         .andExpect(status().isOk());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteNonExistingChargingStation_thenReturnNotFound() throws Exception {
     int stationId = 99;

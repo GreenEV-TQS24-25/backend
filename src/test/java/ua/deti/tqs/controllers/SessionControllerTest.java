@@ -122,9 +122,10 @@ class SessionControllerTest {
 
     @AfterEach
     void tearDown() {
-        securityUtils.close();
+        securi
+    tyUtils.close();
     }
-
+    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByUserId_thenReturnAllSessions() throws Exception {
         when(sessionService.getAllSessionsByUserId(testUser.getId())).thenReturn(testSessions);
@@ -137,6 +138,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$[0].totalCost", is(9.00)));
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByUserId_thenReturnNotFound() throws Exception {
         when(sessionService.getAllSessionsByUserId(testUser.getId())).thenReturn(Collections.emptyList());
@@ -146,6 +148,7 @@ class SessionControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByStationId_thenReturnAllSessions() throws Exception {
         int stationId = testChargingStation.getId();
@@ -158,6 +161,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$[0].chargingSpot.station.id", is(stationId)));
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByStationId_thenReturnNotFound() throws Exception {
         int stationId = 99;
@@ -168,6 +172,7 @@ class SessionControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenCreateValidSession_thenReturnCreatedSession() throws Exception {
         when(sessionService.createSession(eq(testUser.getId()), any(Session.class)))
@@ -181,6 +186,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.uuid", is(testSession.getUuid())));
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenCreateInvalidSession_thenReturnNotFound() throws Exception {
         when(sessionService.createSession(eq(testUser.getId()), any(Session.class)))
@@ -195,6 +201,7 @@ class SessionControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenDeleteExistingSession_thenReturnOk() throws Exception {
         int sessionId = testSession.getId();
@@ -205,6 +212,7 @@ class SessionControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenDeleteNonExistingSession_thenReturnNotFound() throws Exception {
         int sessionId = 99;

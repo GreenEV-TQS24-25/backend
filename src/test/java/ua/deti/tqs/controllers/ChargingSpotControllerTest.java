@@ -109,6 +109,7 @@ class ChargingSpotControllerTest {
     securityUtils.close();
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingSpotsByStationId_withValidId_thenReturnSpots() throws Exception {
     Mockito.when(chargingSpotService.getAllChargingSpotsByStationId(testStation.getId()))
@@ -125,6 +126,7 @@ class ChargingSpotControllerTest {
         .andExpect(jsonPath("$[1].id", is(testSpot2.getId())));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingSpotsByStationId_withInvalidId_thenReturnNotFound() throws Exception {
     int invalidStationId = 999;
@@ -138,6 +140,7 @@ class ChargingSpotControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withValidData_thenReturnCreatedSpot() throws Exception {
     Mockito.when(chargingSpotService.createChargingSpot(anyInt(), any(ChargingSpot.class)))
@@ -164,6 +167,7 @@ class ChargingSpotControllerTest {
         .andExpect(jsonPath("$.connectorType", is(testSpot.getConnectorType().toString())));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withInvalidOperatorId_thenReturnNotFound() throws Exception {
     int invalidOperatorId = 999;
@@ -178,6 +182,7 @@ class ChargingSpotControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingSpot_withValidData_thenReturnUpdatedSpot() throws Exception {
     ChargingSpot updatedSpot = testSpot;
@@ -197,6 +202,7 @@ class ChargingSpotControllerTest {
         .andExpect(jsonPath("$.pricePerKwh", is(updatedSpot.getPricePerKwh().doubleValue())));
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingSpot_withInvalidOperatorId_thenReturnNotFound() throws Exception {
     int invalidOperatorId = 999;
@@ -211,6 +217,7 @@ class ChargingSpotControllerTest {
         .andExpect(status().isNotFound());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingSpot_withValidIds_thenReturnOk() throws Exception {
     Mockito.when(chargingSpotService.deleteChargingSpot(anyInt(), anyInt())).thenReturn(true);
@@ -222,6 +229,7 @@ class ChargingSpotControllerTest {
         .andExpect(status().isOk());
   }
 
+  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingSpot_withInvalidIds_thenReturnNotFound() throws Exception {
     int invalidId = 999;
