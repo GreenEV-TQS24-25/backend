@@ -3,6 +3,7 @@ package ua.deti.tqs.integrations;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
@@ -91,6 +92,7 @@ class ChargingStationIT {
         userRepository.deleteAll();
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenGetAllChargingStations_thenReturnAllStations() {
         // Create additional station from different operator
@@ -110,6 +112,7 @@ class ChargingStationIT {
                 .body("name", containsInAnyOrder("Main Station", "Other Station"));
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenGetStationsByOperator_thenReturnOnlyOwnedStations() {
         given()
@@ -122,6 +125,7 @@ class ChargingStationIT {
                 .body("[0].name", equalTo("Main Station"));
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenCreateValidStation_thenReturnCreatedStation() {
         ChargingStation newStation = new ChargingStation();
@@ -142,6 +146,7 @@ class ChargingStationIT {
                 .body("operator.id", equalTo(operator.getId()));
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenCreateInvalidStation_thenReturnBadRequest() {
         ChargingStation invalidStation = new ChargingStation(); // Missing required fields
@@ -156,6 +161,7 @@ class ChargingStationIT {
                 .statusCode(400);
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenUpdateValidStation_thenReturnUpdatedStation() {
         testStation.setName("Updated Station");
@@ -173,6 +179,7 @@ class ChargingStationIT {
                 .body("lat", equalTo(38.716000f));
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenUpdateUnauthorizedStation_thenReturnBadRequest() {
         // Create station from different operator
@@ -195,6 +202,7 @@ class ChargingStationIT {
                 .statusCode(400);
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenDeleteExistingStation_thenReturnOk() {
         given()
@@ -205,6 +213,7 @@ class ChargingStationIT {
                 .statusCode(200);
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenDeleteNonExistingStation_thenReturnNotFound() {
         int invalidId = 9999;
@@ -217,6 +226,7 @@ class ChargingStationIT {
                 .statusCode(404);
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenDeleteUnauthorizedStation_thenReturnNotFound() {
         // Create station from different operator
