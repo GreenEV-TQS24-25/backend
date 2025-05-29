@@ -77,7 +77,7 @@ class SessionControllerTest {
         Vehicle testVehicle = new Vehicle();
         testVehicle.setId(1);
         testVehicle.setLicensePlate("AB-12-CD");
-        testVehicle.setBrand("Tesla");
+        testVehicle.setBrand("Brand");
         testVehicle.setModel("Model 3");
         testVehicle.setUser(testUser);
 

@@ -1,12 +1,19 @@
 package ua.deti.tqs.services;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
+import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.UserRepository;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
@@ -18,10 +25,10 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   private static final String USER_NOT_OPERATOR_MESSAGE = "The user with id {} is not an operator";
   private final ChargingStationRepository chargingStationRepository;
   private final UserRepository userRepository;
+  private final ChargingSpotRepository chargingSpotRepository;
 
   @Override
   public List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId) {
-    // need to grant that the operator is an operator
     if (!isOperator(operatorId)) {
       logInvalidOperator(operatorId);
       return Collections.emptyList();
@@ -102,7 +109,6 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   @Override
   public ChargingStation updateChargingStation(int operatorId, ChargingStation chargingStation) {
 
-    // need to grant that the operator is an operator
     if (!isOperator(operatorId)) {
       logInvalidOperator(operatorId);
       return null;
@@ -163,5 +169,23 @@ public class ChargingStationServiceImpl implements ChargingStationService {
 
   private void logInvalidOperator(int operatorId) {
     log.debug(USER_NOT_OPERATOR_MESSAGE, operatorId);
+  }
+
+  @Override
+  public List<ChargingStation> filterChargingStations(List<ConnectorType> connectorTypes){
+    return chargingStationRepository.findAll().stream()
+        .filter(station -> getConnectorTypes(station).containsAll(connectorTypes)).toList();
+  }
+
+  private List<ConnectorType> getConnectorTypes(ChargingStation station){
+    List<ConnectorType> connectorTypes = new ArrayList<>();
+    Optional<List<ChargingSpot>> chargingSpots = chargingSpotRepository.findAllByStation_Id(station.getId());
+    if (!chargingSpots.isPresent()){
+      return Collections.emptyList();
+    }
+    for (ChargingSpot chargingSpot : chargingSpots.get()) {
+      connectorTypes.add(chargingSpot.getConnectorType());
+    }
+    return connectorTypes;
   }
 }
