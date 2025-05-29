@@ -72,7 +72,6 @@ class SessionServiceTest {
     session.setDuration(3600);
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenGetAllSessionsByUserId_thenReturnSessions() {
     when(sessionRepository.findAllByVehicle_User_Id(user.getId()))
@@ -85,7 +84,6 @@ class SessionServiceTest {
     assertThat(found.get(0).getId()).isEqualTo(1);
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenGetAllSessionsByUserId_thenReturnEmptyList() {
     when(sessionRepository.findAllByVehicle_User_Id(user.getId())).thenReturn(Optional.empty());
@@ -96,7 +94,6 @@ class SessionServiceTest {
     assertThat(found).isEmpty();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenGetAllSessionsByStationId_thenReturnSessions() {
     when(chargingStationRepository.existsById(chargingStation.getId())).thenReturn(true);
@@ -110,7 +107,6 @@ class SessionServiceTest {
     assertThat(found.get(0).getId()).isEqualTo(1);
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenGetAllSessionsByStationId_thenReturnEmptyList() {
     when(chargingStationRepository.existsById(chargingStation.getId())).thenReturn(true);
@@ -122,7 +118,6 @@ class SessionServiceTest {
     assertThat(found).isEmpty();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenGetAllSessionsByStationId_withInvalidStationId_thenReturnEmptyList() {
     when(chargingStationRepository.existsById(chargingStation.getId())).thenReturn(false);
@@ -133,7 +128,6 @@ class SessionServiceTest {
     assertThat(found).isEmpty();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withInvalidVehicle_thenReturnNull() {
     when(vehicleRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -143,7 +137,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withVehicleBelongingToDifferentUser_thenReturnNull() {
     User differentUser = new User();
@@ -157,7 +150,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withInvalidChargingSpot_thenReturnNull() {
     when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
@@ -169,7 +161,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withOverlappingSession_thenReturnNull() {
     Session overlappingSession = new Session();
@@ -187,7 +178,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withNullStartTime_thenReturnNull() {
     session.setStartTime(null);
@@ -203,7 +193,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withInvalidDuration_thenReturnNull() {
     session.setDuration(0);
@@ -219,7 +208,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withMultipleValidationErrors_thenReturnNull() {
     session.setStartTime(null);
@@ -236,7 +224,6 @@ class SessionServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withValidData_thenReturnSession() {
     when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
@@ -256,7 +243,6 @@ class SessionServiceTest {
     assertThat(created.getDuration()).isEqualTo(session.getDuration());
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_thenCalculateTotalCost() {
     session.setDuration(3600); // 1 hour = 3600 seconds
@@ -275,7 +261,6 @@ class SessionServiceTest {
     assertThat(created.getTotalCost()).isEqualByComparingTo(expectedCost);
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenCreateSession_withNoOverlappingSessions_thenReturnSession() {
     Session nonOverlappingSession = new Session();
@@ -295,7 +280,6 @@ class SessionServiceTest {
     assertThat(created).isNotNull();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenDeleteSession_thenReturnTrue() {
     when(sessionRepository.findById(session.getId())).thenReturn(Optional.of(session));
@@ -305,7 +289,6 @@ class SessionServiceTest {
     assertThat(deleted).isTrue();
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenDeleteSession_withInvalidSession_thenReturnFalse() {
     when(sessionRepository.findById(session.getId())).thenReturn(Optional.empty());
@@ -316,7 +299,6 @@ class SessionServiceTest {
     verify(sessionRepository, never()).delete(any());
   }
 
-  @Requirement("GREEN-24")
   @Test
   void whenDeleteSession_withDifferentUser_thenReturnFalse() {
     User differentUser = new User();

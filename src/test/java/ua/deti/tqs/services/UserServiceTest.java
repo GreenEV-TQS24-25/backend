@@ -75,7 +75,6 @@ class UserServiceTest {
     SecurityContextHolder.clearContext();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenGetUserById_thenReturnUser() {
     when(userRepository.findById(1)).thenReturn(Optional.of(user));
@@ -85,7 +84,6 @@ class UserServiceTest {
     assertThat(found).isEqualTo(user);
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenGetUserById_withInvalidId_thenReturnNull() {
     when(userRepository.findById(2)).thenReturn(Optional.empty());
@@ -95,7 +93,6 @@ class UserServiceTest {
     assertThat(found).isNull();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenCreateUser_thenReturnUser() {
     when(userRepository.save(any())).thenReturn(user);
@@ -111,7 +108,6 @@ class UserServiceTest {
     assertThat(created.getRole()).isEqualTo(Role.USER);
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenCreateUser_withPartialData_thenReturnUser() {
     User toCreate = new User();
@@ -130,7 +126,6 @@ class UserServiceTest {
     assertThat(created.getRole()).isEqualTo(Role.USER);
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenCreateUser_withInvalidData_thenReturnNull() {
     User created = userTableService.createUser(userInvalid);
@@ -138,7 +133,6 @@ class UserServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenCreateUser_withNullData_thenReturnNull() {
     User created = userTableService.createUser(userNull);
@@ -146,7 +140,6 @@ class UserServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUser_thenReturnUpdatedUser() {
     when(userRepository.findById(1)).thenReturn(Optional.of(user));
@@ -165,7 +158,6 @@ class UserServiceTest {
     assertThat(updated.getRole()).isEqualTo(Role.OPERATOR);
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUser_withInvalidId_thenReturnNull() {
     when(userRepository.findById(2)).thenReturn(Optional.empty());
@@ -175,7 +167,6 @@ class UserServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUser_withInvalidData_thenReturnNull() {
     when(userRepository.findById(1)).thenReturn(Optional.of(user));
@@ -187,7 +178,6 @@ class UserServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUser_withNullData_thenReturnNull() {
     when(userRepository.findById(1)).thenReturn(Optional.of(user));
@@ -199,7 +189,6 @@ class UserServiceTest {
     assertThat(updated).isNull();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteUser_thenReturnTrue() {
     when(userRepository.findById(1)).thenReturn(Optional.of(user));
@@ -209,7 +198,6 @@ class UserServiceTest {
     assertThat(deleted).isTrue();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteUser_withInvalidId_thenReturnFalse() {
     when(userRepository.findById(2)).thenReturn(Optional.empty());
@@ -219,7 +207,6 @@ class UserServiceTest {
     assertThat(deleted).isFalse();
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenLoginUser_withValidCredentials_thenReturnLoginResponse() {
     when(userRepository.findByEmail("Email 1")).thenReturn(Optional.of(user));
@@ -251,7 +238,6 @@ class UserServiceTest {
     verify(jwtUtils).getExpirationFromJwtToken(mockToken);
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenLoginUser_withNonExistentUser_thenReturnNull() {
     when(userRepository.findByEmail("Email 1")).thenReturn(Optional.empty());
@@ -265,7 +251,6 @@ class UserServiceTest {
     verifyNoInteractions(jwtUtils);
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenLoginUser_withAuthenticationException_thenHandleException() {
     when(userRepository.findByEmail("Email 1")).thenReturn(Optional.of(user));

@@ -112,6 +112,7 @@ class ChargingSpotIT {
         userRepository.deleteAll();
     }
 
+
     @Test
     void whenGetSpotsByStationId_thenReturnSpots() {
         given()

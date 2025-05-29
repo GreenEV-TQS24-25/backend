@@ -90,7 +90,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenGetAllVehiclesByUserId_thenReturnAllVehicles() throws Exception {
     when(vehicleService.getAllVehiclesByUserId(testUser.getId())).thenReturn(testVehicles);
 
@@ -104,7 +103,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenGetAllVehiclesByUserId_thenReturnNotFound() throws Exception {
     when(vehicleService.getAllVehiclesByUserId(testUser.getId()))
         .thenReturn(Collections.emptyList());
@@ -117,7 +115,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenCreateValidVehicle_thenReturnCreatedVehicle() throws Exception {
     when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser))).thenReturn(testVehicle);
 
@@ -131,7 +128,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenCreateInvalidVehicle_thenReturnBadRequest() throws Exception {
     when(vehicleService.createVehicle(any(Vehicle.class), eq(testUser))).thenReturn(null);
 
@@ -147,7 +143,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenUpdateValidVehicle_thenReturnUpdatedVehicle() throws Exception {
     when(vehicleService.updateVehicle(eq(testUser.getId()), any(Vehicle.class)))
         .thenReturn(testVehicle);
@@ -162,7 +157,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenUpdateInvalidVehicle_thenReturnNotFound() throws Exception {
     when(vehicleService.updateVehicle(eq(testUser.getId()), any(Vehicle.class))).thenReturn(null);
 
@@ -178,7 +172,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenDeleteExistingVehicle_thenReturnOk() throws Exception {
     int vehicleId = 1;
     when(vehicleService.deleteVehicle(vehicleId, testUser.getId())).thenReturn(true);
@@ -191,7 +184,6 @@ class VehicleControllerTest {
   }
 
   @Test
-  @Requirement("GREEN-24")
   void whenDeleteNonExistingVehicle_thenReturnNotFound() throws Exception {
     int vehicleId = 99;
     when(vehicleService.deleteVehicle(vehicleId, testUser.getId())).thenReturn(false);

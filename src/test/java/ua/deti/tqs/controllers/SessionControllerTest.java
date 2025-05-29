@@ -63,8 +63,6 @@ class SessionControllerTest {
     private Session testSession;
     private List<Session> testSessions;
     private User testUser;
-    private Vehicle testVehicle;
-    private ChargingSpot testChargingSpot;
     private ChargingStation testChargingStation;
 
     @BeforeEach
@@ -76,7 +74,7 @@ class SessionControllerTest {
         testUser.setPassword("password");
         testUser.setRole(Role.USER);
 
-        testVehicle = new Vehicle();
+        Vehicle testVehicle = new Vehicle();
         testVehicle.setId(1);
         testVehicle.setLicensePlate("AB-12-CD");
         testVehicle.setBrand("Tesla");
@@ -89,7 +87,7 @@ class SessionControllerTest {
         testChargingStation.setLat(new BigDecimal("40.712776"));
         testChargingStation.setLon(new BigDecimal("-74.005974"));
 
-        testChargingSpot = new ChargingSpot();
+        ChargingSpot testChargingSpot = new ChargingSpot();
         testChargingSpot.setId(1);
         testChargingSpot.setStation(testChargingStation);
         testChargingSpot.setPowerKw(new BigDecimal("50.00"));
@@ -122,10 +120,9 @@ class SessionControllerTest {
 
     @AfterEach
     void tearDown() {
-        securi
-    tyUtils.close();
+        securityUtils.close();
     }
-    @Requirement("GREEN-24")
+
     @Test
     void whenGetAllSessionsByUserId_thenReturnAllSessions() throws Exception {
         when(sessionService.getAllSessionsByUserId(testUser.getId())).thenReturn(testSessions);
@@ -138,7 +135,6 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$[0].totalCost", is(9.00)));
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByUserId_thenReturnNotFound() throws Exception {
         when(sessionService.getAllSessionsByUserId(testUser.getId())).thenReturn(Collections.emptyList());
@@ -148,7 +144,6 @@ class SessionControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByStationId_thenReturnAllSessions() throws Exception {
         int stationId = testChargingStation.getId();
@@ -161,7 +156,6 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$[0].chargingSpot.station.id", is(stationId)));
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenGetAllSessionsByStationId_thenReturnNotFound() throws Exception {
         int stationId = 99;
@@ -172,7 +166,6 @@ class SessionControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenCreateValidSession_thenReturnCreatedSession() throws Exception {
         when(sessionService.createSession(eq(testUser.getId()), any(Session.class)))
@@ -186,7 +179,6 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.uuid", is(testSession.getUuid())));
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenCreateInvalidSession_thenReturnNotFound() throws Exception {
         when(sessionService.createSession(eq(testUser.getId()), any(Session.class)))
@@ -201,7 +193,6 @@ class SessionControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenDeleteExistingSession_thenReturnOk() throws Exception {
         int sessionId = testSession.getId();
@@ -212,7 +203,6 @@ class SessionControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Requirement("GREEN-24")
     @Test
     void whenDeleteNonExistingSession_thenReturnNotFound() throws Exception {
         int sessionId = 99;

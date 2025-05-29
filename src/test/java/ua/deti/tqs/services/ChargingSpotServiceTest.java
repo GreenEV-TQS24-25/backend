@@ -59,7 +59,6 @@ class ChargingSpotServiceTest {
     chargingSpot.setPricePerKwh(BigDecimal.valueOf(0.5));
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingSpotsByStationId_thenReturnChargingSpots() {
     when(chargingSpotRepository.findAllByStation_Id(chargingStation1.getId()))
@@ -76,7 +75,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).findAllByStation_Id(chargingStation1.getId());
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingSpotsByStationId_withInvalidId_thenReturnEmptyList() {
     when(chargingSpotRepository.findAllByStation_Id(999)).thenReturn(Optional.empty());
@@ -88,7 +86,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).findAllByStation_Id(999);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_thenReturnCreatedChargingSpot() {
     when(chargingStationRepository.findById(chargingStation1.getId()))
@@ -106,7 +103,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).save(any(ChargingSpot.class));
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withPartialData_thenReturnCreatedChargingSpot() {
     when(chargingStationRepository.findById(chargingStation1.getId()))
@@ -128,7 +124,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).save(any(ChargingSpot.class));
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withIncompleteData_thenReturnNull() {
     when(chargingStationRepository.findById(chargingStation1.getId()))
@@ -144,7 +139,6 @@ class ChargingSpotServiceTest {
     verify(chargingStationRepository).findById(chargingStation1.getId());
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withInvalidStation_thenReturnNull() {
     when(chargingStationRepository.findById(chargingStation1.getId())).thenReturn(Optional.empty());
@@ -156,7 +150,6 @@ class ChargingSpotServiceTest {
     verify(chargingStationRepository).findById(chargingStation1.getId());
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withoutStation_thenReturnNull() {
     chargingSpot.setStation(null);
@@ -166,7 +159,6 @@ class ChargingSpotServiceTest {
     assertThat(created).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingSpot_withInvalidOperator_thenReturnNull() {
     when(chargingStationRepository.findById(chargingStation1.getId()))
@@ -179,7 +171,6 @@ class ChargingSpotServiceTest {
     verify(chargingStationRepository).findById(chargingStation1.getId());
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingSpot_thenReturnUpdatedChargingSpot() {
     when(chargingSpotRepository.findById(chargingSpot.getId()))
@@ -197,7 +188,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).save(chargingSpot);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingSpot_withPartialData_thenReturnUpdatedChargingSpot() {
     when(chargingSpotRepository.findById(chargingSpot.getId()))
@@ -224,7 +214,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).save(chargingSpot);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingSpot_withInvalidId_thenReturnNull() {
     when(chargingSpotRepository.findById(operator1.getId())).thenReturn(Optional.empty());
@@ -236,7 +225,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).findById(operator1.getId());
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingSpot_withInvalidOperator_thenReturnNull() {
     when(chargingSpotRepository.findById(chargingSpot.getId()))
@@ -253,7 +241,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).findById(chargingSpot.getId());
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingSpot_thenReturnTrue() {
     when(chargingSpotRepository.findById(chargingSpot.getId()))
@@ -268,7 +255,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).delete(chargingSpot);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingSpot_withInvalidId_thenReturnFalse() {
     when(chargingSpotRepository.findById(999)).thenReturn(Optional.empty());
@@ -280,7 +266,6 @@ class ChargingSpotServiceTest {
     verify(chargingSpotRepository).findById(999);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingSpot_withInvalidOperator_thenReturnFalse() {
     when(chargingSpotRepository.findById(chargingSpot.getId()))

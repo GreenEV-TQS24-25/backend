@@ -68,10 +68,9 @@ class UserControllerTest {
 
   @AfterEach
   void tearDown() {
-    sec
-  urityUtils.close();
+    securityUtils.close();
   }
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
+
   @Test
   void whenCreateValidUser_thenReturnCreatedUser() throws Exception {
     when(customUserDetailsService.loadUserByUsername(testUser.getEmail())).thenReturn(testUser);
@@ -100,7 +99,6 @@ class UserControllerTest {
     verify(userService, times(1)).createUser(any(User.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenCreateInvalidUser_thenReturnBadRequest() throws Exception {
     when(userService.createUser(any(User.class))).thenReturn(null);
@@ -117,7 +115,6 @@ class UserControllerTest {
     verify(userService, times(1)).createUser(any(User.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateValidUser_thenReturnUpdatedUser() throws Exception {
     when(userService.updateUser(eq(testUser.getId()), any(User.class))).thenReturn(testUser);
@@ -145,7 +142,6 @@ class UserControllerTest {
     verify(userService, times(1)).updateUser(eq(testUser.getId()), any(User.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUserWithInvalidId_thenReturnNotFound() throws Exception {
     int invalidId = 999;
@@ -161,7 +157,6 @@ class UserControllerTest {
     verify(userService, times(1)).updateUser(anyInt(), any(User.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteExistingUser_thenReturnOk() throws Exception {
     when(userService.deleteUser(testUser.getId())).thenReturn(true);
@@ -173,7 +168,6 @@ class UserControllerTest {
     verify(userService, times(1)).deleteUser(testUser.getId());
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteNonExistingUser_thenReturnNotFound() throws Exception {
     int invalidId = 999;
@@ -186,7 +180,6 @@ class UserControllerTest {
     verify(userService, times(1)).deleteUser(anyInt());
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenLoginWithValidCredentials_thenReturnOkAndLoginResponse() throws Exception {
     LoginRequest loginRequest = new LoginRequest(testUser.getEmail(), testUser.getPassword());
@@ -215,7 +208,6 @@ class UserControllerTest {
     verify(userService, times(1)).loginUser(any(LoginRequest.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenLoginWithInvalidCredentials_thenReturnUnauthorized() throws Exception {
     LoginRequest loginRequest = new LoginRequest("wrong@example.com", "wrong password");
@@ -232,7 +224,6 @@ class UserControllerTest {
     verify(userService, times(1)).loginUser(any(LoginRequest.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUserAndUpdatedUserIsNull_thenReturnNotFound() throws Exception {
     when(userService.updateUser(eq(testUser.getId()), any(User.class))).thenReturn(null);
@@ -247,7 +238,6 @@ class UserControllerTest {
     verify(userService, times(1)).updateUser(eq(testUser.getId()), any(User.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUserWithPassword_thenReturnLoginResponse() throws Exception {
     User updatedUser = new User();
@@ -283,7 +273,6 @@ class UserControllerTest {
     verify(userService, times(1)).loginUser(any(LoginRequest.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUserWithEmptyPassword_thenReturnUpdatedUser() throws Exception {
     User updatedUser = new User();
@@ -309,7 +298,6 @@ class UserControllerTest {
     verify(userService, never()).loginUser(any(LoginRequest.class));
   }
 
-  @Requirement({"GREEN-64", "GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateUserWithNullPassword_thenReturnUpdatedUser() throws Exception {
     User updatedUser = new User();

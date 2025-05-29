@@ -50,7 +50,6 @@ class ChargingStationServiceTest {
     chargingStation1.setOperator(operator1);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void getAllChargingStationsByOperatorId_operatorValid_stationsFound() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
@@ -62,7 +61,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNotEmpty();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void getAllChargingStationsByOperatorId_operatorValid_noStationsFound() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
@@ -73,7 +71,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEmpty();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStationsByOperatorId_withUserNotOperator_thenReturnEmptyList() {
     operator1.setRole(Role.USER);
@@ -84,7 +81,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEmpty();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withOperatorIdMismatch_thenReturnNull() {
     User differentOperator = new User();
@@ -97,7 +93,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withOperatorIdCorrect_andChargingStationIdIncorrect() {
     User differentOperator = new User();
@@ -112,7 +107,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withOperatorBeingNull_thenReturnNull() {
     chargingStation1.setOperator(null);
@@ -123,7 +117,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withLatNull_thenReturnNull() {
     chargingStation1.setLat(null);
@@ -135,7 +128,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withLonNull_thenReturnNull() {
     chargingStation1.setLat(BigDecimal.valueOf(40.7128));
@@ -147,7 +139,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStation_withChangedOperator_thenIgnoreChange() {
     User newOperator = new User();
@@ -161,7 +152,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withNonMatchingOperatorId_thenReturnNull() {
     // Configura um ChargingStation com um operador diferente do ID fornecido
@@ -183,7 +173,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withNullStation_thenReturnNull() {
     ChargingStation result = chargingStationService.createChargingStation(null, operator1.getId());
@@ -191,7 +180,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withNullName_thenReturnNull() {
     ChargingStation invalidStation = new ChargingStation();
@@ -208,7 +196,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withInvalidLatitude_thenReturnNull() {
     ChargingStation invalidStation = new ChargingStation();
@@ -226,7 +213,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withInvalidLongitude_thenReturnNull() {
     ChargingStation invalidStation = new ChargingStation();
@@ -244,7 +230,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withEmptyName_thenReturnNull() {
     ChargingStation invalidStation = new ChargingStation();
@@ -261,7 +246,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withOperatorRoleNotOperator_thenReturnNull() {
     // Configurar um usuário que não tem o papel de OPERATOR
@@ -282,7 +266,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withDifferentOperatorId_thenReturnNull() {
     // Configurar um operador com ID diferente do ID autenticado
@@ -304,7 +287,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withInvalidOperatorIdZero_thenReturnNull() {
     // Configurar um operador com ID 0 (inválido)
@@ -326,7 +308,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withInvalidOperatorIdNegative_thenReturnNull() {
     // Configurar um operador com ID negativo (inválido)
@@ -348,7 +329,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withValidOperatorButDifferentAuthenticatedId_thenReturnNull() {
     // Caso em que o operador da estação é válido, mas o ID autenticado não corresponde
@@ -369,7 +349,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStationsByOperatorId_thenReturnList() {
     List<ChargingStation> chargingStations = List.of(chargingStation1);
@@ -383,7 +362,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository).findAllByOperator_Id(1);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStations_withNullOperatorId_thenReturnEmptyList() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
@@ -395,7 +373,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository).findAllByOperator_Id(1);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStationsByOperatorId_withInvalidOperatorId_thenReturnEmptyList() {
 
@@ -404,7 +381,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEmpty();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStations_thenReturnList() {
     List<ChargingStation> chargingStations = List.of(chargingStation1);
@@ -416,7 +392,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository).findAll();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenGetAllChargingStations_withEmptyList_thenReturnEmptyList() {
     when(chargingStationRepository.findAll()).thenReturn(List.of());
@@ -427,7 +402,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository).findAll();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_thenReturnChargingStation() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
@@ -439,7 +413,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEqualTo(chargingStation1);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withTheBasicInfo_thenReturnChargingStation() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
@@ -453,7 +426,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEqualTo(chargingStation1);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withInvalidUser_thenReturnNull() {
     when(userRepository.findById(999)).thenReturn(Optional.empty());
@@ -462,7 +434,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withInvalidData_thenReturnNull() {
     ChargingStation invalidChargingStation = new ChargingStation();
@@ -476,7 +447,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withPartialInvalidData_thenReturnNull() {
     ChargingStation invalidChargingStation = new ChargingStation();
@@ -490,7 +460,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withNullOperator_thenReturnNull() {
     ChargingStation invalidChargingStation = new ChargingStation();
@@ -504,7 +473,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withAUserNotOperator_thenReturnNull() {
     ChargingStation invalidChargingStation = new ChargingStation();
@@ -522,7 +490,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenCreateChargingStation_withOperatorNotFound_thenReturnNull() {
     ChargingStation invalidChargingStation = new ChargingStation();
@@ -539,7 +506,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStation_thenReturnUpdatedChargingStation() {
     ChargingStation updatedChargingStation = new ChargingStation();
@@ -559,7 +525,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEqualTo(updatedChargingStation);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStation_withInvalidOperatorId_thenReturnNull() {
 
@@ -568,7 +533,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStation_withNonExistentId_thenReturnNull() {
     ChargingStation stationToUpdate = new ChargingStation();
@@ -590,7 +554,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository, never()).save(any(ChargingStation.class));
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStationWithIncompleteData_thenReturnUpdatedChargingStation() {
     ChargingStation updatedChargingStation = new ChargingStation();
@@ -619,7 +582,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEqualTo(updatedChargingStation);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStationWithFullData_thenReturnUpdatedChargingStation() {
     ChargingStation updatedChargingStation = new ChargingStation();
@@ -641,7 +603,6 @@ class ChargingStationServiceTest {
     assertThat(result).isEqualTo(updatedChargingStation);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenUpdateChargingStation_withInvalidData_thenReturnNull() {
     ChargingStation invalidChargingStation = new ChargingStation();
@@ -654,7 +615,6 @@ class ChargingStationServiceTest {
     assertThat(result).isNull();
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingStation_thenReturnTrue() {
     when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
@@ -665,7 +625,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository).findById(1);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingStation_withInvalidId_thenReturnFalse() {
     when(chargingStationRepository.findById(999)).thenReturn(Optional.empty());
@@ -676,7 +635,6 @@ class ChargingStationServiceTest {
     verify(chargingStationRepository).findById(999);
   }
 
-  @Requirement({"GREEN-24", "GREEN-21"})
   @Test
   void whenDeleteChargingStation_withInvalidOperatorId_thenReturnFalse() {
     when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
