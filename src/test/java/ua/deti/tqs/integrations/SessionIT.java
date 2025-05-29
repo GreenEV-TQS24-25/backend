@@ -3,6 +3,7 @@ package ua.deti.tqs.integrations;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
@@ -121,6 +122,7 @@ class SessionIT {
         userRepository.deleteAll();
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenGetSessionsByUser_thenReturnSessions() {
         given()
@@ -134,6 +136,7 @@ class SessionIT {
                 .body("[0].chargingSpot.powerKw", equalTo(150.00f));
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenGetSessionsByStation_thenReturnSessions() {
         given()
@@ -146,6 +149,7 @@ class SessionIT {
                 .body("[0].uuid", notNullValue());
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenCreateValidSession_thenReturnCreatedSession() {
         Session newSession = new Session();
@@ -165,6 +169,7 @@ class SessionIT {
                 .body("totalCost", equalTo(0.45f * 150f * (30 / 3600f)));
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenCreateInvalidSession_thenReturnNotFound() {
         Session invalidSession = new Session();
@@ -183,6 +188,7 @@ class SessionIT {
                 .statusCode(404);
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenDeleteExistingSession_thenReturnOk() {
         given()
@@ -193,6 +199,7 @@ class SessionIT {
                 .statusCode(200);
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenDeleteNonExistingSession_thenReturnNotFound() {
         int invalidId = 9999;
@@ -205,6 +212,7 @@ class SessionIT {
                 .statusCode(404);
     }
 
+    @Requirement("GREEN-25")
     @Test
     void whenDeleteUnauthorizedSession_thenReturnNotFound() {
         User otherUser = new User();

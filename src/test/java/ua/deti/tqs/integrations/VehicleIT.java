@@ -3,6 +3,7 @@ package ua.deti.tqs.integrations;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
@@ -77,6 +78,7 @@ class VehicleIT {
     vehicleRepository.deleteAll();
   }
 
+  @Requirement("GREEN-21")
   @Test
   void whenGetAllVehiclesByUserId_ThenReturnListWithVehicles() {
     given()
@@ -89,6 +91,7 @@ class VehicleIT {
         .body("[0].brand", equalTo(vehicle.getBrand()));
   }
 
+  @Requirement("GREEN-21")
   @Test
   void whenCreateValidVehicle_ThenReturnCreatedVehicle() {
     Vehicle newVehicle = new Vehicle();
@@ -112,6 +115,7 @@ class VehicleIT {
             .body("connectorType", equalTo(newVehicle.getConnectorType().name()));
   }
 
+  @Requirement("GREEN-23")
   @Test
   void whenUpdateExistingVehicle_ThenReturnUpdatedVehicle() {
 
@@ -134,6 +138,7 @@ class VehicleIT {
             .body("licensePlate", equalTo(vehicle.getLicensePlate()));
   }
 
+  @Requirement("GREEN-23")
   @Test
   void whenDeleteExistingVehicle_ThenReturnOk() {
     given()
@@ -144,6 +149,7 @@ class VehicleIT {
             .statusCode(200);
   }
 
+  @Requirement("GREEN-23")
   @Test
   void whenDeleteNonExistingVehicle_ThenReturnNotFound() {
     int invalidVehicleId = 9999;

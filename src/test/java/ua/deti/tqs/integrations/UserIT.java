@@ -3,6 +3,7 @@ package ua.deti.tqs.integrations;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.AfterEach;
@@ -69,6 +70,7 @@ class UserIT {
         userRepository.deleteAll();
     }
 
+    @Requirement("GREEN-64")
     @Test
     void whenCreateValidUser_thenReturnCreated() {
         User newUser = new User();
@@ -88,6 +90,7 @@ class UserIT {
                 .body("id", notNullValue());
     }
 
+    @Requirement("GREEN-64")
     @Test
     void whenCreateInvalidUser_thenReturnBadRequest() {
         User invalidUser = new User();
@@ -101,6 +104,7 @@ class UserIT {
                 .statusCode(400);
     }
 
+    @Requirement("GREEN-65")
     @Test
     void whenUpdateUserWithValidData_thenReturnUpdatedUser() {
         testUser.setName("Updated Name");
@@ -118,6 +122,7 @@ class UserIT {
                 .body("email", equalTo("updated@example.com"));
     }
 
+    @Requirement("GREEN-65")
     @Test
     void whenUpdateUserPassword_thenReturnNewToken() {
         testUser.setPassword("newPassword123");
@@ -133,6 +138,7 @@ class UserIT {
                 .body("token", notNullValue());
     }
 
+    @Requirement("GREEN-64")
     @Test
     void whenDeleteExistingUser_thenReturnOk() {
         given()
@@ -143,6 +149,7 @@ class UserIT {
                 .statusCode(200);
     }
 
+    @Requirement("GREEN-64")
     @Test
     void whenLoginWithValidCredentials_thenReturnToken() {
         LoginRequest validCredentials = new LoginRequest("email", "testpassword");
@@ -158,6 +165,7 @@ class UserIT {
                 .body("id", equalTo(testUser.getId()));
     }
 
+    @Requirement("GREEN-64")
     @Test
     void whenLoginWithInvalidCredentials_thenReturnUnauthorized() {
         LoginRequest invalidCredentials = new LoginRequest("test@example.com", "wrongPassword");
