@@ -63,8 +63,6 @@ class SessionControllerTest {
     private Session testSession;
     private List<Session> testSessions;
     private User testUser;
-    private Vehicle testVehicle;
-    private ChargingSpot testChargingSpot;
     private ChargingStation testChargingStation;
 
     @BeforeEach
@@ -76,7 +74,7 @@ class SessionControllerTest {
         testUser.setPassword("password");
         testUser.setRole(Role.USER);
 
-        testVehicle = new Vehicle();
+        Vehicle testVehicle = new Vehicle();
         testVehicle.setId(1);
         testVehicle.setLicensePlate("AB-12-CD");
         testVehicle.setBrand("Brand");
@@ -89,7 +87,7 @@ class SessionControllerTest {
         testChargingStation.setLat(new BigDecimal("40.712776"));
         testChargingStation.setLon(new BigDecimal("-74.005974"));
 
-        testChargingSpot = new ChargingSpot();
+        ChargingSpot testChargingSpot = new ChargingSpot();
         testChargingSpot.setId(1);
         testChargingSpot.setStation(testChargingStation);
         testChargingSpot.setPowerKw(new BigDecimal("50.00"));

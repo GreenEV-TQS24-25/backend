@@ -1,6 +1,11 @@
 package ua.deti.tqs.services;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,253 +18,244 @@ import ua.deti.tqs.entities.Vehicle;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.VehicleRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class VehicleServiceTest {
-    @Mock private VehicleRepository vehicleRepository;
+  @Mock private VehicleRepository vehicleRepository;
 
-    @InjectMocks
-    private VehicleServiceImpl chargingStationService;
+  @InjectMocks private VehicleServiceImpl chargingStationService;
 
-    private Vehicle vehicle;
+  private Vehicle vehicle;
 
-    private User user;
+  private User user;
 
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setId(1);
-        user.setRole(Role.OPERATOR);
+  @BeforeEach
+  void setUp() {
+    user = new User();
+    user.setId(1);
+    user.setRole(Role.OPERATOR);
 
-        vehicle = new Vehicle();
-        vehicle.setId(1);
-        vehicle.setBrand("Brand");
-        vehicle.setModel("Model");
-        vehicle.setLicensePlate("ABC123");
-        vehicle.setUser(user);
-    }
+    vehicle = new Vehicle();
+    vehicle.setId(1);
+    vehicle.setBrand("Brand");
+    vehicle.setModel("Model");
+    vehicle.setLicensePlate("ABC123");
+    vehicle.setUser(user);
+  }
 
-    @Test
-    void whenGetAllVehiclesByUserId_thenReturnVehicles() {
-        // given
-        when(vehicleRepository.findAllByUser_Id(user.getId())).thenReturn(Optional.of(List.of(vehicle)));
+  @Test
+  void whenGetAllVehiclesByUserId_thenReturnVehicles() {
+    // given
+    when(vehicleRepository.findAllByUser_Id(user.getId()))
+        .thenReturn(Optional.of(List.of(vehicle)));
 
-        // when
-        List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
+    // when
+    List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
 
-        // then
-        assertThat(found).isNotNull();
-        assertThat(found).hasSize(1);
-        assertThat(found.getFirst().getId()).isEqualTo(1);
-    }
+    // then
+    assertThat(found).isNotNull();
+    assertThat(found).hasSize(1);
+    assertThat(found.getFirst().getId()).isEqualTo(1);
+  }
 
-    @Test
-    void whenGetAllVehiclesByUserId_thenReturnEmptyList() {
-        // given
-        when(vehicleRepository.findAllByUser_Id(user.getId())).thenReturn(Optional.empty());
+  @Test
+  void whenGetAllVehiclesByUserId_thenReturnEmptyList() {
+    // given
+    when(vehicleRepository.findAllByUser_Id(user.getId())).thenReturn(Optional.empty());
 
-        // when
-        List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
+    // when
+    List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
 
-        // then
-        assertThat(found).isNotNull();
-        assertThat(found).isEmpty();
-    }
+    // then
+    assertThat(found).isNotNull();
+    assertThat(found).isEmpty();
+  }
 
-    @Test
-    void whenGetAllVehiclesByUserId_thenReturnNull() {
-        // when
-        List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
+  @Test
+  void whenGetAllVehiclesByUserId_thenReturnNull() {
+    // when
+    List<Vehicle> found = chargingStationService.getAllVehiclesByUserId(user.getId());
 
-        // then
-        assertThat(found).isNotNull();
-        assertThat(found).isEmpty();
-    }
+    // then
+    assertThat(found).isNotNull();
+    assertThat(found).isEmpty();
+  }
 
-    @Test
-    void whenCreateVehicle_thenReturnVehicle() {
-        // given
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+  @Test
+  void whenCreateVehicle_thenReturnVehicle() {
+    // given
+    when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
 
-        // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user);
+    // when
+    Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
-        // then
-        assertThat(created).isNotNull();
-        assertThat(created.getId()).isEqualTo(1);
-    }
+    // then
+    assertThat(created).isNotNull();
+    assertThat(created.getId()).isEqualTo(1);
+  }
 
-    @Test
-    void whenCreateVehicle_withNullConnector_thenReturnVehicle() {
-        // given
-        vehicle.setConnectorType(null);
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+  @Test
+  void whenCreateVehicle_withNullConnector_thenReturnVehicle() {
+    // given
+    vehicle.setConnectorType(null);
+    when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
 
-        // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user);
+    // when
+    Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
-        // then
-        assertThat(created).isNotNull();
-        assertThat(created.getId()).isEqualTo(1);
-    }
+    // then
+    assertThat(created).isNotNull();
+    assertThat(created.getId()).isEqualTo(1);
+  }
 
-    @Test
-    void whenCreateVehicle_withInvalidUser_thenReturnNull() {
-        // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user);
+  @Test
+  void whenCreateVehicle_withInvalidUser_thenReturnNull() {
+    // when
+    Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
-        // then
-        assertThat(created).isNull();
-    }
+    // then
+    assertThat(created).isNull();
+  }
 
-    @Test
-    void whenCreateVehicle_withInvalidData_thenReturnNull() {
-        // given
-        vehicle.setBrand(null);
-        vehicle.setModel(null);
-        vehicle.setLicensePlate(null);
-        vehicle.setConnectorType(null);
+  @Test
+  void whenCreateVehicle_withInvalidData_thenReturnNull() {
+    // given
+    vehicle.setBrand(null);
+    vehicle.setModel(null);
+    vehicle.setLicensePlate(null);
+    vehicle.setConnectorType(null);
 
-        // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user);
+    // when
+    Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
-        // then
-        assertThat(created).isNull();
-    }
+    // then
+    assertThat(created).isNull();
+  }
 
-    @Test
-    void whenCreateVehicle_withEmptyData_thenReturnNull() {
-        // given
-        vehicle.setBrand("");
-        vehicle.setModel("");
-        vehicle.setLicensePlate("");
+  @Test
+  void whenCreateVehicle_withEmptyData_thenReturnNull() {
+    // given
+    vehicle.setBrand("");
+    vehicle.setModel("");
+    vehicle.setLicensePlate("");
 
-        // when
-        Vehicle created = chargingStationService.createVehicle(vehicle, user);
+    // when
+    Vehicle created = chargingStationService.createVehicle(vehicle, user);
 
-        // then
-        assertThat(created).isNull();
-    }
+    // then
+    assertThat(created).isNull();
+  }
 
-    @Test
-    void whenUpdateVehicle_thenReturnUpdatedVehicle() {
-        // given
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
-        when(vehicleRepository.save(vehicle)).thenReturn(vehicle);
+  @Test
+  void whenUpdateVehicle_thenReturnUpdatedVehicle() {
+    // given
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
+    when(vehicleRepository.save(vehicle)).thenReturn(vehicle);
 
-        // when
-        Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
+    // when
+    Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
 
-        // then
-        assertThat(updated).isNotNull();
-        assertThat(updated.getId()).isEqualTo(1);
-    }
+    // then
+    assertThat(updated).isNotNull();
+    assertThat(updated.getId()).isEqualTo(1);
+  }
 
-    @Test
-    void whenUpdateVehicle_withWrongId_thenReturnNull() {
-        // given
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
+  @Test
+  void whenUpdateVehicle_withWrongId_thenReturnNull() {
+    // given
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
 
-        // when
-        Vehicle updated = chargingStationService.updateVehicle(4, vehicle);
+    // when
+    Vehicle updated = chargingStationService.updateVehicle(4, vehicle);
 
-        // then
-        assertThat(updated).isNull();
-    }
+    // then
+    assertThat(updated).isNull();
+  }
 
-    @Test
-    void whenUpdateVehicle_withInvalidUser_thenReturnNull() {
-        // when
-        Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
+  @Test
+  void whenUpdateVehicle_withInvalidUser_thenReturnNull() {
+    // when
+    Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
 
-        // then
-        assertThat(updated).isNull();
-    }
+    // then
+    assertThat(updated).isNull();
+  }
 
-    @Test
-    void whenUpdateVehicle_withInvalidData_thenReturnNull() {
-        // given
-        vehicle.setBrand(null);
-        vehicle.setModel(null);
-        vehicle.setLicensePlate(null);
-        vehicle.setConnectorType(null);
+  @Test
+  void whenUpdateVehicle_withInvalidData_thenReturnNull() {
+    // given
+    vehicle.setBrand(null);
+    vehicle.setModel(null);
+    vehicle.setLicensePlate(null);
+    vehicle.setConnectorType(null);
 
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
 
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
+    // when
+    Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
 
-        // when
-        Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
+    // then
+    assertThat(updated).isNull();
+  }
 
-        // then
-        assertThat(updated).isNull();
-    }
+  @Test
+  void whenUpdateVehicle_withEmptyData_thenReturnNull() {
+    // given
+    vehicle.setBrand("");
+    vehicle.setModel("");
+    vehicle.setLicensePlate("");
 
-    @Test
-    void whenUpdateVehicle_withEmptyData_thenReturnNull() {
-        // given
-        vehicle.setBrand("");
-        vehicle.setModel("");
-        vehicle.setLicensePlate("");
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
 
+    // when
+    Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
 
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
+    // then
+    assertThat(updated).isNull();
+  }
 
-        // when
-        Vehicle updated = chargingStationService.updateVehicle(user.getId(), vehicle);
+  @Test
+  void whenDeleteVehicle_thenReturnTrue() {
+    // given
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
 
-        // then
-        assertThat(updated).isNull();
-    }
+    // when
+    boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
 
-    @Test
-    void whenDeleteVehicle_thenReturnTrue() {
-        // given
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
+    // then
+    assertThat(deleted).isTrue();
+  }
 
-        // when
-        boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
+  @Test
+  void whenDeleteVehicle_withInvalidUser_thenReturnFalse() {
+    // when
+    boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
 
-        // then
-        assertThat(deleted).isTrue();
-    }
+    // then
+    assertThat(deleted).isFalse();
+  }
 
-    @Test
-    void whenDeleteVehicle_withInvalidUser_thenReturnFalse() {
-        // when
-        boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
+  @Test
+  void whenDeleteVehicle_withInvalidVehicle_thenReturnFalse() {
+    // given
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.empty());
 
-        // then
-        assertThat(deleted).isFalse();
-    }
+    // when
+    boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
 
-    @Test
-    void whenDeleteVehicle_withInvalidVehicle_thenReturnFalse() {
-        // given
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.empty());
+    // then
+    assertThat(deleted).isFalse();
+  }
 
-        // when
-        boolean deleted = chargingStationService.deleteVehicle(user.getId(), vehicle.getId());
+  @Test
+  void whenDeleteVehicle_withInvalidUserId_thenReturnFalse() {
+    // given
+    when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
 
-        // then
-        assertThat(deleted).isFalse();
-    }
+    // when
+    boolean deleted = chargingStationService.deleteVehicle(vehicle.getId(), 2);
 
-    @Test
-    void whenDeleteVehicle_withInvalidUserId_thenReturnFalse() {
-        // given
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
-
-        // when
-        boolean deleted = chargingStationService.deleteVehicle(vehicle.getId(),2);
-
-        // then
-        assertThat(deleted).isFalse();
-    }
+    // then
+    assertThat(deleted).isFalse();
+  }
 }

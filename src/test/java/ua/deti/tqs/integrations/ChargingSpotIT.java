@@ -3,6 +3,7 @@ package ua.deti.tqs.integrations;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
@@ -112,6 +113,7 @@ class ChargingSpotIT {
         userRepository.deleteAll();
     }
 
+    @Requirement("GREEN-24")
     @Test
     void whenGetSpotsByStationId_thenReturnSpots() {
         given()
@@ -124,6 +126,7 @@ class ChargingSpotIT {
                 .body("[0].connectorType", equalTo("SAEJ1772"));
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenCreateValidSpot_thenReturnCreatedSpot() {
         ChargingSpot newSpot = new ChargingSpot();
@@ -147,6 +150,7 @@ class ChargingSpotIT {
                 .body("station.id", equalTo(station.getId()));
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenCreateInvalidSpot_thenReturnBadRequest() {
         ChargingSpot invalidSpot = new ChargingSpot();
@@ -161,6 +165,7 @@ class ChargingSpotIT {
                 .statusCode(404); // Adjust based on your error handling
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenUpdateValidSpot_thenReturnUpdatedSpot() {
         testSpot.setPricePerKwh(new BigDecimal("0.55"));
@@ -178,6 +183,7 @@ class ChargingSpotIT {
                 .body("state", equalTo("OCCUPIED"));
     }
 
+    @Requirement("GREEN-30")
     @Test
     void whenUpdateUnauthorizedSpot_thenReturnForbidden() {
         // Create station and spot from different operator
@@ -211,6 +217,7 @@ class ChargingSpotIT {
                 .statusCode(404);
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenDeleteExistingSpot_thenReturnOk() {
         given()
@@ -221,6 +228,7 @@ class ChargingSpotIT {
                 .statusCode(200);
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenDeleteNonExistingSpot_thenReturnNotFound() {
         int invalidId = 9999;
@@ -233,6 +241,7 @@ class ChargingSpotIT {
                 .statusCode(404);
     }
 
+    @Requirement("GREEN-29")
     @Test
     void whenDeleteUnauthorizedSpot_thenReturnNotFound() {
         // Create station and spot from different operator

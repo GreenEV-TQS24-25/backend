@@ -1,9 +1,9 @@
 INSERT INTO user_table (id, name, email, password, role) VALUES
-                                                             (1, 'admin', 'admin@admin.com', 'password123', 'OPERATOR'),
-                                                             (2, 'Jane Operator', 'jane@example.com', 'password123', 'OPERATOR'),
-                                                             (3, 'Alice User', 'alice@example.com', 'password123', 'USER'),
-                                                             (4, 'Bob User', 'bob@example.com', 'password123', 'USER'),
-                                                             (5, 'user', 'user@user.com', 'password123', 'USER');
+                                                             (1, 'admin', 'admin@admin.com', '$2b$12$oRjaIuC3w9Q/.5QED/42yu0nlRBxBCEXrB2abXwq5FPk858REL7XO', 'OPERATOR'),
+                                                             (2, 'Jane Operator', 'jane@example.com', '$2b$12$oRjaIuC3w9Q/.5QED/42yu0nlRBxBCEXrB2abXwq5FPk858REL7XO', 'OPERATOR'),
+                                                             (3, 'Alice User', 'alice@example.com', '$2b$12$oRjaIuC3w9Q/.5QED/42yu0nlRBxBCEXrB2abXwq5FPk858REL7XO', 'USER'),
+                                                             (4, 'Bob User', 'bob@example.com', '$2b$12$oRjaIuC3w9Q/.5QED/42yu0nlRBxBCEXrB2abXwq5FPk858REL7XO', 'USER'),
+                                                             (5, 'user', 'user@user.com', '$2b$12$oRjaIuC3w9Q/.5QED/42yu0nlRBxBCEXrB2abXwq5FPk858REL7XO', 'USER');
 
 INSERT INTO vehicle (id, user_id, brand, model, license_plate, connector_type) VALUES
                                                                                    (1, 3, 'Tesla', 'Model S', 'ABC-123', 'SAEJ1772'),
