@@ -16,7 +16,7 @@ INSERT INTO charging_station (name, lat, lon, operator_id, photo_url) VALUES
 
 INSERT INTO charging_spot (station_id, charging_velocity, connector_type, power_kw, price_per_kwh, state) VALUES
                                                                                                                   (1, 'NORMAL', 'SAEJ1772', 7.5, 0.30, 'FREE'),
-                                                                                                                  (2, 'FAST', 'CCS', 50.00, 0.40, 'OCCUPIED'),
+                                                                                                                  (1, 'FAST', 'CCS', 50.00, 0.40, 'OCCUPIED'),
                                                                                                                   (2, 'FASTPP', 'CHADEMO', 150.00, 0.50, 'FREE'),
                                                                                                                   (2, 'FASTPP', 'MENNEKES', 150.00, 0.50, 'OUT_OF_SERVICE');
 
