@@ -66,10 +66,8 @@ public class ChargingStationServiceImpl implements ChargingStationService {
           chargingSpotRepository.findAllByStation_Id(station.getId());
       stationsSpotsList.add(new StationsSpots(station, spots.orElse(Collections.emptyList())));
     }
-    return stationsSpotsList.stream().map(x -> {
-      x.getChargingStation().setOperator(null);
-        return x;
-    }).toList();
+    stationsSpotsList.forEach(x -> x.getChargingStation().setOperator(null));
+    return stationsSpotsList.stream().toList();
   }
 
   @Override
