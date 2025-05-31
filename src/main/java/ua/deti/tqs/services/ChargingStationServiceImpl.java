@@ -29,23 +29,32 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   private final ChargingSpotRepository chargingSpotRepository;
 
   @Override
-  public List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId) {
+  public List<StationsSpots> getAllChargingStationsByOperatorId(int operatorId) {
     if (!isOperator(operatorId)) {
       logInvalidOperator(operatorId);
       return Collections.emptyList();
     }
+
     log.debug("Fetching all charging stations with operator id {}", operatorId);
     List<ChargingStation> chargingStations =
-        chargingStationRepository.findAllByOperator_Id(operatorId).orElse(null);
+            chargingStationRepository.findAllByOperator_Id(operatorId).orElse(Collections.emptyList());
 
-    if (chargingStations == null) {
+    if (chargingStations.isEmpty()) {
       log.debug("No charging stations found with operator id {}", operatorId);
       return Collections.emptyList();
     }
 
-    log.debug(
-        "Found {} charging stations with operator id {}", chargingStations.size(), operatorId);
-    return chargingStations;
+    log.debug("Found {} charging stations with operator id {}", chargingStations.size(), operatorId);
+
+    // Map each station to StationsSpots DTO with its spots
+    List<StationsSpots> result = new ArrayList<>();
+    for (ChargingStation station : chargingStations) {
+      List<ChargingSpot> spots = chargingSpotRepository.findAllByStation_Id(station.getId())
+              .orElse(Collections.emptyList());
+      result.add(new StationsSpots(station, spots));
+    }
+
+    return result;
   }
 
   @Override

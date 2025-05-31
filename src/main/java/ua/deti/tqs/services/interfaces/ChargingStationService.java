@@ -7,7 +7,7 @@ import ua.deti.tqs.entities.types.ConnectorType;
 import java.util.List;
 
 public interface ChargingStationService {
-    List<ChargingStation> getAllChargingStationsByOperatorId(int operatorId);
+    List<StationsSpots> getAllChargingStationsByOperatorId(int operatorId);
 
     List<StationsSpots> getAllChargingStations();
 
