@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.deti.tqs.dto.StationsSpots;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.services.interfaces.ChargingStationService;
@@ -35,10 +36,10 @@ public class ChargingStationController {
       description = "Fetches a list of all chargingStation.")
   @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
   @ApiResponse(responseCode = "404", description = "No chargingStation found")
-  public ResponseEntity<List<ChargingStation>> getAllChargingStations() {
+  public ResponseEntity<List<StationsSpots>> getAllChargingStations() {
     log.info("Fetching all chargingStation");
 
-    List<ChargingStation> chargingStation = chargingStationService.getAllChargingStations();
+    List<StationsSpots> chargingStation = chargingStationService.getAllChargingStations();
 
     if (chargingStation.isEmpty()) {
       log.warn("No chargingStation found");

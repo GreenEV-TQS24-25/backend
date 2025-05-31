@@ -28,6 +28,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.deti.tqs.components.AuthTokenFilter;
+import ua.deti.tqs.dto.StationsSpots;
+import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.ConnectorType;
@@ -93,15 +95,39 @@ class ChargingStationControllerTest {
 
   @Test
   void whenGetAllChargingStations_thenReturnAllStations() throws Exception {
-    when(chargingStationService.getAllChargingStations()).thenReturn(testStations);
+    // Create test data
+    ChargingStation station1 = new ChargingStation();
+    station1.setId(1);
+    station1.setName("Station 1");
+
+    ChargingStation station2 = new ChargingStation();
+    station2.setId(2);
+    station2.setName("Station 2");
+
+    // Create spots for stations
+    ChargingSpot spot1 = new ChargingSpot();
+    spot1.setId(1);
+
+    ChargingSpot spot2 = new ChargingSpot();
+    spot2.setId(2);
+
+    // Create StationsSpots objects
+    StationsSpots stationsSpots1 = new StationsSpots(station1, List.of(spot1));
+    StationsSpots stationsSpots2 = new StationsSpots(station2, List.of(spot2));
+    List<StationsSpots> testStationsSpots = List.of(stationsSpots1, stationsSpots2);
+
+    // Mock service response
+    when(chargingStationService.getAllChargingStations()).thenReturn(testStationsSpots);
 
     mockMvc
-        .perform(
-            get("/" + Constants.API_V1 + "public/charging-stations/all")
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0].name", is(testStation.getName())));
+            .perform(
+                    get("/" + Constants.API_V1 + "public/charging-stations/all")
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))  // Verify array size
+            .andExpect(jsonPath("$[0].chargingStation.name", is("Station 1")))  // Nested structure
+            .andExpect(jsonPath("$[0].spots[0].id", is(1)))  // Verify spot exists
+            .andExpect(jsonPath("$[0].chargingStation.operator").doesNotExist());  // Operator nullified
   }
 
   @Test
