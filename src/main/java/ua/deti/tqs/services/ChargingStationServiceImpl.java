@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import ua.deti.tqs.dto.StationsSpots;
 import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.types.ConnectorType;
@@ -48,8 +49,25 @@ public class ChargingStationServiceImpl implements ChargingStationService {
   }
 
   @Override
-  public List<ChargingStation> getAllChargingStations() {
-    return chargingStationRepository.findAll();
+  public List<StationsSpots> getAllChargingStations() {
+
+    log.debug("Fetching all charging stations");
+    List<ChargingStation> chargingStations = chargingStationRepository.findAll();
+
+    if (chargingStations.isEmpty()) {
+      log.debug("No charging stations found");
+      return Collections.emptyList();
+    }
+
+    log.debug("Found {} charging stations", chargingStations.size());
+    List<StationsSpots> stationsSpotsList = new ArrayList<>();
+    for (ChargingStation station : chargingStations) {
+      Optional<List<ChargingSpot>> spots =
+          chargingSpotRepository.findAllByStation_Id(station.getId());
+      stationsSpotsList.add(new StationsSpots(station, spots.orElse(Collections.emptyList())));
+    }
+    stationsSpotsList.forEach(x -> x.getChargingStation().setOperator(null));
+    return stationsSpotsList.stream().toList();
   }
 
   @Override

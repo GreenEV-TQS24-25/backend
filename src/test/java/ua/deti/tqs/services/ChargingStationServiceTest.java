@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
+import ua.deti.tqs.dto.StationsSpots;
 import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
@@ -396,23 +397,52 @@ class ChargingStationServiceTest {
 
   @Test
   void whenGetAllChargingStations_thenReturnList() {
-    List<ChargingStation> chargingStations = List.of(chargingStation1);
-    when(chargingStationRepository.findAll()).thenReturn(chargingStations);
+    // Create test data
+    ChargingStation station = new ChargingStation();
+    station.setId(1);
+    station.setName("Test Station");
+    station.setOperator(new User()); // Simulate an operator
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStations();
+    ChargingSpot spot = new ChargingSpot();
+    spot.setId(1);
+    spot.setStation(station);
 
-    assertThat(result).isEqualTo(chargingStations);
+    // Mock repository responses
+    when(chargingStationRepository.findAll()).thenReturn(List.of(station));
+    when(chargingSpotRepository.findAllByStation_Id(station.getId()))
+            .thenReturn(Optional.of(List.of(spot)));
+
+    // Call service method
+    List<StationsSpots> result = chargingStationService.getAllChargingStations();
+
+    // Verify results
+    assertThat(result).hasSize(1);
+
+    StationsSpots stationsSpots = result.get(0);
+    assertThat(stationsSpots.getChargingStation().getId()).isEqualTo(station.getId());
+    assertThat(stationsSpots.getChargingStation().getOperator()).isNull(); // Operator should be nullified
+    assertThat(stationsSpots.getSpots()).hasSize(1);
+    assertThat(stationsSpots.getSpots().get(0).getId()).isEqualTo(spot.getId());
+
+    // Verify repository interactions
     verify(chargingStationRepository).findAll();
+    verify(chargingSpotRepository).findAllByStation_Id(station.getId());
   }
 
   @Test
   void whenGetAllChargingStations_withEmptyList_thenReturnEmptyList() {
+    // Mock empty station list
     when(chargingStationRepository.findAll()).thenReturn(List.of());
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStations();
+    // Call service method
+    List<StationsSpots> result = chargingStationService.getAllChargingStations();
 
+    // Verify results
     assertThat(result).isEmpty();
+
+    // Verify repository interactions
     verify(chargingStationRepository).findAll();
+    verify(chargingSpotRepository, never()).findAllByStation_Id(anyInt()); // Should not be called
   }
 
   @Test

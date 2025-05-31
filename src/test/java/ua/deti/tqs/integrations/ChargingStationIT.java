@@ -106,7 +106,7 @@ class ChargingStationIT {
                 .then()
                 .statusCode(200)
                 .body("", hasSize(2))
-                .body("name", containsInAnyOrder("Main Station", "Other Station"));
+                .body("chargingStation.name", containsInAnyOrder("Main Station", "Other Station"));
     }
 
     @Requirement("GREEN-30")
