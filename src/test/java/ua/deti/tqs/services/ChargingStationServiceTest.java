@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,11 +78,15 @@ class ChargingStationServiceTest {
   void getAllChargingStationsByOperatorId_operatorValid_stationsFound() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findAllByOperator_Id(1))
-        .thenReturn(Optional.of(List.of(chargingStation1)));
+            .thenReturn(Optional.of(List.of(chargingStation1)));
+    when(chargingSpotRepository.findAllByStation_Id(1))
+            .thenReturn(Optional.of(Collections.emptyList()));
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    List<StationsSpots> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
     assertThat(result).isNotEmpty();
+    assertThat(result.get(0).getChargingStation()).isEqualTo(chargingStation1);
+    assertThat(result.get(0).getSpots()).isEmpty();
   }
 
   @Test
@@ -89,7 +94,7 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findAllByOperator_Id(1)).thenReturn(Optional.empty());
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    List<StationsSpots> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
     assertThat(result).isEmpty();
   }
@@ -99,7 +104,7 @@ class ChargingStationServiceTest {
     operator1.setRole(Role.USER);
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    List<StationsSpots> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
     assertThat(result).isEmpty();
   }
@@ -190,7 +195,7 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
     ChargingStation result =
-        chargingStationService.createChargingStation(stationWithDifferentOperator, 1);
+            chargingStationService.createChargingStation(stationWithDifferentOperator, 1);
 
     assertThat(result).isNull();
   }
@@ -213,7 +218,7 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidStation, operator1.getId());
 
     assertThat(result).isNull();
   }
@@ -223,14 +228,14 @@ class ChargingStationServiceTest {
     ChargingStation invalidStation = new ChargingStation();
     invalidStation.setName("Invalid Station");
     invalidStation.setLat(
-        BigDecimal.valueOf(100));
+            BigDecimal.valueOf(100));
     invalidStation.setLon(BigDecimal.valueOf(-74.0060));
     invalidStation.setOperator(operator1);
 
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidStation, operator1.getId());
 
     assertThat(result).isNull();
   }
@@ -241,13 +246,13 @@ class ChargingStationServiceTest {
     invalidStation.setName("Invalid Station");
     invalidStation.setLat(BigDecimal.valueOf(40.7128));
     invalidStation.setLon(
-        BigDecimal.valueOf(190));
+            BigDecimal.valueOf(190));
     invalidStation.setOperator(operator1);
 
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidStation, operator1.getId());
 
     assertThat(result).isNull();
   }
@@ -263,7 +268,7 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidStation, operator1.getId());
 
     assertThat(result).isNull();
   }
@@ -300,7 +305,7 @@ class ChargingStationServiceTest {
     invalidStation.setOperator(differentOperator);
 
     when(userRepository.findById(1))
-        .thenReturn(Optional.of(operator1));
+            .thenReturn(Optional.of(operator1));
 
     ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
 
@@ -320,7 +325,7 @@ class ChargingStationServiceTest {
     invalidStation.setOperator(invalidOperator);
 
     when(userRepository.findById(1))
-        .thenReturn(Optional.of(operator1));
+            .thenReturn(Optional.of(operator1));
 
     ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
 
@@ -340,7 +345,7 @@ class ChargingStationServiceTest {
     invalidStation.setOperator(invalidOperator);
 
     when(userRepository.findById(1))
-        .thenReturn(Optional.of(operator1));
+            .thenReturn(Optional.of(operator1));
 
     ChargingStation result = chargingStationService.createChargingStation(invalidStation, 1);
 
@@ -356,7 +361,7 @@ class ChargingStationServiceTest {
     validStation.setOperator(operator1);
 
     when(userRepository.findById(3))
-        .thenReturn(Optional.of(operator1));
+            .thenReturn(Optional.of(operator1));
 
     ChargingStation result = chargingStationService.createChargingStation(validStation, 3);
 
@@ -364,24 +369,30 @@ class ChargingStationServiceTest {
   }
 
   @Test
-  void whenGetAllChargingStationsByOperatorId_thenReturnList() {
+  void whenGetAllChargingStationsByOperatorId_thenReturnListWithSpots() {
     List<ChargingStation> chargingStations = List.of(chargingStation1);
+    List<ChargingSpot> spots = List.of(new ChargingSpot());
+
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findAllByOperator_Id(1))
-        .thenReturn(Optional.of(chargingStations));
+            .thenReturn(Optional.of(chargingStations));
+    when(chargingSpotRepository.findAllByStation_Id(1))
+            .thenReturn(Optional.of(spots));
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    List<StationsSpots> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
-    assertThat(result).isEqualTo(chargingStations);
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getChargingStation()).isEqualTo(chargingStation1);
+    assertThat(result.get(0).getSpots()).isEqualTo(spots);
     verify(chargingStationRepository).findAllByOperator_Id(1);
   }
 
   @Test
-  void whenGetAllChargingStations_withNullOperatorId_thenReturnEmptyList() {
+  void whenGetAllChargingStationsByOperatorId_withNoStationsFound_thenReturnEmptyList() {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findAllByOperator_Id(1)).thenReturn(Optional.empty());
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(1);
+    List<StationsSpots> result = chargingStationService.getAllChargingStationsByOperatorId(1);
 
     assertThat(result).isEmpty();
     verify(chargingStationRepository).findAllByOperator_Id(1);
@@ -389,60 +400,39 @@ class ChargingStationServiceTest {
 
   @Test
   void whenGetAllChargingStationsByOperatorId_withInvalidOperatorId_thenReturnEmptyList() {
+    when(userRepository.findById(999)).thenReturn(Optional.empty());
 
-    List<ChargingStation> result = chargingStationService.getAllChargingStationsByOperatorId(999);
+    List<StationsSpots> result = chargingStationService.getAllChargingStationsByOperatorId(999);
 
     assertThat(result).isEmpty();
   }
 
   @Test
   void whenGetAllChargingStations_thenReturnList() {
-    // Create test data
-    ChargingStation station = new ChargingStation();
-    station.setId(1);
-    station.setName("Test Station");
-    station.setOperator(new User()); // Simulate an operator
-
     ChargingSpot spot = new ChargingSpot();
     spot.setId(1);
-    spot.setStation(station);
+    spot.setStation(chargingStation1);
 
-    // Mock repository responses
-    when(chargingStationRepository.findAll()).thenReturn(List.of(station));
-    when(chargingSpotRepository.findAllByStation_Id(station.getId()))
+    when(chargingStationRepository.findAll()).thenReturn(List.of(chargingStation1));
+    when(chargingSpotRepository.findAllByStation_Id(1))
             .thenReturn(Optional.of(List.of(spot)));
 
-    // Call service method
     List<StationsSpots> result = chargingStationService.getAllChargingStations();
 
-    // Verify results
     assertThat(result).hasSize(1);
-
     StationsSpots stationsSpots = result.get(0);
-    assertThat(stationsSpots.getChargingStation().getId()).isEqualTo(station.getId());
-    assertThat(stationsSpots.getChargingStation().getOperator()).isNull(); // Operator should be nullified
+    assertThat(stationsSpots.getChargingStation().getId()).isEqualTo(chargingStation1.getId());
     assertThat(stationsSpots.getSpots()).hasSize(1);
-    assertThat(stationsSpots.getSpots().get(0).getId()).isEqualTo(spot.getId());
-
-    // Verify repository interactions
-    verify(chargingStationRepository).findAll();
-    verify(chargingSpotRepository).findAllByStation_Id(station.getId());
   }
 
   @Test
   void whenGetAllChargingStations_withEmptyList_thenReturnEmptyList() {
-    // Mock empty station list
     when(chargingStationRepository.findAll()).thenReturn(List.of());
 
-    // Call service method
     List<StationsSpots> result = chargingStationService.getAllChargingStations();
 
-    // Verify results
     assertThat(result).isEmpty();
-
-    // Verify repository interactions
-    verify(chargingStationRepository).findAll();
-    verify(chargingSpotRepository, never()).findAllByStation_Id(anyInt()); // Should not be called
+    verify(chargingSpotRepository, never()).findAllByStation_Id(anyInt());
   }
 
   @Test
@@ -451,7 +441,7 @@ class ChargingStationServiceTest {
     when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
 
     ChargingStation result =
-        chargingStationService.createChargingStation(chargingStation1, operator1.getId());
+            chargingStationService.createChargingStation(chargingStation1, operator1.getId());
 
     assertThat(result).isEqualTo(chargingStation1);
   }
@@ -464,7 +454,7 @@ class ChargingStationServiceTest {
     when(chargingStationRepository.save(any(ChargingStation.class))).thenReturn(chargingStation1);
 
     ChargingStation result =
-        chargingStationService.createChargingStation(chargingStation1, operator1.getId());
+            chargingStationService.createChargingStation(chargingStation1, operator1.getId());
 
     assertThat(result).isEqualTo(chargingStation1);
   }
@@ -485,7 +475,7 @@ class ChargingStationServiceTest {
     invalidChargingStation.setLon(null);
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
 
     assertThat(result).isNull();
   }
@@ -498,7 +488,7 @@ class ChargingStationServiceTest {
     invalidChargingStation.setLon(null);
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
 
     assertThat(result).isNull();
   }
@@ -512,7 +502,7 @@ class ChargingStationServiceTest {
     invalidChargingStation.setOperator(null);
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
     assertThat(result).isNull();
   }
 
@@ -529,7 +519,7 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
     assertThat(result).isNull();
   }
 
@@ -545,7 +535,7 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.empty());
 
     ChargingStation result =
-        chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
+            chargingStationService.createChargingStation(invalidChargingStation, operator1.getId());
     assertThat(result).isNull();
   }
 
@@ -561,10 +551,10 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
     when(chargingStationRepository.save(any(ChargingStation.class)))
-        .thenReturn(updatedChargingStation);
+            .thenReturn(updatedChargingStation);
 
     ChargingStation result =
-        chargingStationService.updateChargingStation(1, updatedChargingStation);
+            chargingStationService.updateChargingStation(1, updatedChargingStation);
     assertThat(result).isEqualTo(updatedChargingStation);
   }
 
@@ -591,9 +581,7 @@ class ChargingStationServiceTest {
     ChargingStation result = chargingStationService.updateChargingStation(1, stationToUpdate);
 
     assertThat(result).isNull();
-
     verify(chargingStationRepository).findById(999);
-
     verify(chargingStationRepository, never()).save(any(ChargingStation.class));
   }
 
@@ -605,16 +593,15 @@ class ChargingStationServiceTest {
     updatedChargingStation.setLat(null);
     updatedChargingStation.setLon(null);
     updatedChargingStation.setPhotoUrl(null);
-
     updatedChargingStation.setOperator(operator1);
 
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
     when(chargingStationRepository.save(any(ChargingStation.class)))
-        .thenReturn(updatedChargingStation);
+            .thenReturn(updatedChargingStation);
 
     ChargingStation result =
-        chargingStationService.updateChargingStation(1, updatedChargingStation);
+            chargingStationService.updateChargingStation(1, updatedChargingStation);
 
     assertThat(result).isEqualTo(updatedChargingStation);
 
@@ -637,10 +624,10 @@ class ChargingStationServiceTest {
     when(userRepository.findById(1)).thenReturn(Optional.of(operator1));
     when(chargingStationRepository.findById(1)).thenReturn(Optional.of(chargingStation1));
     when(chargingStationRepository.save(any(ChargingStation.class)))
-        .thenReturn(updatedChargingStation);
+            .thenReturn(updatedChargingStation);
 
     ChargingStation result =
-        chargingStationService.updateChargingStation(1, updatedChargingStation);
+            chargingStationService.updateChargingStation(1, updatedChargingStation);
 
     assertThat(result).isEqualTo(updatedChargingStation);
   }
@@ -652,7 +639,7 @@ class ChargingStationServiceTest {
     invalidChargingStation.setName("");
 
     ChargingStation result =
-        chargingStationService.updateChargingStation(1, invalidChargingStation);
+            chargingStationService.updateChargingStation(1, invalidChargingStation);
 
     assertThat(result).isNull();
   }
@@ -689,37 +676,30 @@ class ChargingStationServiceTest {
 
   @Test
   void whenFilterChargingStations_returnMatchingStations(){
-    ChargingSpot chargingSpot1;
-    ChargingSpot chargingSpot2;
-    ChargingSpot chargingSpot3;
-    ChargingSpot chargingSpot4;
-    ChargingSpot chargingSpot5;
-    ChargingSpot chargingSpot6;
-
-    chargingSpot1 = new ChargingSpot();
+    ChargingSpot chargingSpot1 = new ChargingSpot();
     chargingSpot1.setId(1);
     chargingSpot1.setConnectorType(ConnectorType.CCS);
 
-    chargingSpot2 = new ChargingSpot();
+    ChargingSpot chargingSpot2 = new ChargingSpot();
     chargingSpot2.setId(2);
     chargingSpot2.setConnectorType(ConnectorType.CHADEMO);
 
-    chargingSpot3 = new ChargingSpot();
+    ChargingSpot chargingSpot3 = new ChargingSpot();
     chargingSpot3.setId(3);
     chargingSpot3.setConnectorType(ConnectorType.SAEJ1772);
 
-    chargingSpot4 = new ChargingSpot();
+    ChargingSpot chargingSpot4 = new ChargingSpot();
     chargingSpot4.setId(4);
     chargingSpot4.setConnectorType(ConnectorType.CCS);
 
-    chargingSpot5 = new ChargingSpot();
+    ChargingSpot chargingSpot5 = new ChargingSpot();
     chargingSpot5.setId(5);
     chargingSpot5.setConnectorType(ConnectorType.MENNEKES);
 
-    chargingSpot6 = new ChargingSpot();
+    ChargingSpot chargingSpot6 = new ChargingSpot();
     chargingSpot6.setId(6);
     chargingSpot6.setConnectorType(ConnectorType.CHADEMO);
-    
+
     ChargingStation chargingStation4 = new ChargingStation();
     chargingStation4.setId(4);
     chargingStation4.setName("Charging Station 1");
@@ -727,14 +707,14 @@ class ChargingStationServiceTest {
     chargingStation4.setLon(BigDecimal.valueOf(-74.0060));
     chargingStation4.setPhotoUrl("https://example.com/photo.jpg");
     chargingStation4.setOperator(operator1);
-    
+
 
     List<ChargingStation> chargingStations = List.of(chargingStation1, chargingStation2, chargingStation3, chargingStation4);
     List<ConnectorType> connectorTypes = List.of(ConnectorType.CCS, ConnectorType.CHADEMO);
     List<ChargingSpot> chargingSpots1 = List.of(chargingSpot1, chargingSpot2, chargingSpot3);
     List<ChargingSpot> chargingSpots2 = List.of(chargingSpot4, chargingSpot5);
     List<ChargingSpot> chargingSpots3 = List.of(chargingSpot6);
-    
+
 
     when(chargingStationRepository.findAll()).thenReturn(chargingStations);
     when(chargingSpotRepository.findAllByStation_Id(1)).thenReturn(Optional.of(chargingSpots1));

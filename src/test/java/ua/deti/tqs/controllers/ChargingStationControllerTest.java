@@ -95,7 +95,6 @@ class ChargingStationControllerTest {
 
   @Test
   void whenGetAllChargingStations_thenReturnAllStations() throws Exception {
-    // Create test data
     ChargingStation station1 = new ChargingStation();
     station1.setId(1);
     station1.setName("Station 1");
@@ -104,19 +103,16 @@ class ChargingStationControllerTest {
     station2.setId(2);
     station2.setName("Station 2");
 
-    // Create spots for stations
     ChargingSpot spot1 = new ChargingSpot();
     spot1.setId(1);
 
     ChargingSpot spot2 = new ChargingSpot();
     spot2.setId(2);
 
-    // Create StationsSpots objects
     StationsSpots stationsSpots1 = new StationsSpots(station1, List.of(spot1));
     StationsSpots stationsSpots2 = new StationsSpots(station2, List.of(spot2));
     List<StationsSpots> testStationsSpots = List.of(stationsSpots1, stationsSpots2);
 
-    // Mock service response
     when(chargingStationService.getAllChargingStations()).thenReturn(testStationsSpots);
 
     mockMvc
@@ -124,11 +120,11 @@ class ChargingStationControllerTest {
                     get("/" + Constants.API_V1 + "public/charging-stations/all")
                             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(2)))  // Verify array size
-            .andExpect(jsonPath("$[0].chargingStation.name", is("Station 1")))  // Nested structure
-            .andExpect(jsonPath("$[0].spots[0].id", is(1)))  // Verify spot exists
-            .andExpect(jsonPath("$[0].chargingStation.operator").doesNotExist());  // Operator nullified
-  }
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].chargingStation.name", is("Station 1")))
+            .andExpect(jsonPath("$[0].spots[0].id", is(1)))
+            .andExpect(jsonPath("$[0].chargingStation.operator").doesNotExist());
+    }
 
   @Test
   void whenGetAllChargingStations_thenReturnEmptyList() throws Exception {
@@ -144,16 +140,21 @@ class ChargingStationControllerTest {
   @Test
   void whenGetAllChargingStationsByOperatorId_thenReturnStations() throws Exception {
     int operatorId = 1;
+
+    StationsSpots stationsSpots1 = new StationsSpots(testStations.get(0), Collections.emptyList());
+    StationsSpots stationsSpots2 = new StationsSpots(testStations.get(1), Collections.emptyList());
+    List<StationsSpots> testStationsSpots = Arrays.asList(stationsSpots1, stationsSpots2);
+
     when(chargingStationService.getAllChargingStationsByOperatorId(operatorId))
-        .thenReturn(testStations);
+            .thenReturn(testStationsSpots);
 
     mockMvc
-        .perform(
-            get("/" + Constants.API_V1 + "private/charging-stations")
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0].operator.id", is(operatorId)));
+            .perform(
+                    get("/" + Constants.API_V1 + "private/charging-stations")
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].chargingStation.operator.id", is(operatorId)));
   }
 
   @Test
@@ -191,7 +192,7 @@ class ChargingStationControllerTest {
         .thenReturn(null);
 
     ChargingStation invalidStation = new ChargingStation();
-    invalidStation.setName(""); // Invalid name
+    invalidStation.setName("");
 
     mockMvc
         .perform(
@@ -223,7 +224,7 @@ class ChargingStationControllerTest {
         .thenReturn(null);
 
     ChargingStation invalidStation = new ChargingStation();
-    invalidStation.setName(""); // Invalid name
+    invalidStation.setName("");
 
     mockMvc
         .perform(

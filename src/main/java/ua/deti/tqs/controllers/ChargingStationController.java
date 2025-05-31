@@ -55,11 +55,11 @@ public class ChargingStationController {
       description = "Fetches a list of all chargingStation by operator id.")
   @ApiResponse(responseCode = "200", description = "List of chargingStation retrieved successfully")
   @ApiResponse(responseCode = "404", description = "No chargingStation found")
-  public ResponseEntity<List<ChargingStation>> getAllChargingStationsByOperatorId() {
+  public ResponseEntity<List<StationsSpots>> getAllChargingStationsByOperatorId() {
     int operatorId = getAuthenticatedUser().getId();
     log.info("Fetching all chargingStation with operator id {}", operatorId);
 
-    List<ChargingStation> chargingStation =
+    List<StationsSpots> chargingStation =
         chargingStationService.getAllChargingStationsByOperatorId(operatorId);
 
     if (chargingStation.isEmpty()) {

@@ -119,7 +119,7 @@ class ChargingStationIT {
                 .then()
                 .statusCode(200)
                 .body("", hasSize(1))
-                .body("[0].name", equalTo("Main Station"));
+                .body("[0].chargingStation.name", equalTo("Main Station"));
     }
 
     @Requirement("GREEN-29")
