@@ -40,6 +40,6 @@ public class Payment {
   private Instant dateHour = Instant.now();
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "state", columnDefinition = "payment_state not null")
+  @Column(name = "state",  nullable = false)
   private PaymentState state = PaymentState.PENDING;
 }

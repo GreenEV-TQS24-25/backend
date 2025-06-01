@@ -36,14 +36,14 @@ public class ChargingSpot {
   private BigDecimal pricePerKwh;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "charging_velocity", columnDefinition = "sonic not null")
+  @Column(name = "charging_velocity", nullable = false)
   private Sonic chargingVelocity = Sonic.NORMAL;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "connector_type", columnDefinition = "connector_type not null")
+  @Column(name = "connector_type", nullable = false)
   private ConnectorType connectorType = ConnectorType.SAEJ1772;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "state", columnDefinition = "spot_state not null")
+  @Column(name = "state", nullable = false)
   private SpotState state = SpotState.FREE;
 }
