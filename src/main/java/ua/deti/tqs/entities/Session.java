@@ -8,10 +8,13 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import ua.deti.tqs.entities.types.PaymentState;
 
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "session")
 public class Session {
   @Id
@@ -42,6 +45,16 @@ public class Session {
 
   @Column(name = "total_cost", precision = 8, scale = 2)
   private BigDecimal totalCost;
+
+  @Column(name = "payment_intent_id")
+  private String paymentIntentId;
+
+  @Column(name = "payment_status")
+  @Enumerated(EnumType.STRING)
+  private PaymentState paymentStatus = PaymentState.PENDING;
+
+  @Column(name = "payment_client_secret")
+  private String paymentClientSecret;
 
   @PrePersist
   public void generateTokenAndTimestamp() {
