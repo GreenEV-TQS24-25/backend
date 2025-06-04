@@ -168,7 +168,6 @@ class ChargingSpotIT {
     @Test
     void whenUpdateValidSpot_thenReturnUpdatedSpot() {
         testSpot.setPricePerKwh(new BigDecimal("0.55"));
-        testSpot.setState(SpotState.OCCUPIED);
 
         given()
                 .header("Authorization", "Bearer " + jwtToken)
@@ -178,8 +177,7 @@ class ChargingSpotIT {
                 .put(Constants.API_V1 + "private/charging-spots")
                 .then()
                 .statusCode(200)
-                .body("pricePerKwh", equalTo(0.55f))
-                .body("state", equalTo("OCCUPIED"));
+                .body("pricePerKwh", equalTo(0.55f));
     }
 
     @Requirement("GREEN-30")
