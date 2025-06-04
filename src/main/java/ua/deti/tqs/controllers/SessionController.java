@@ -74,7 +74,7 @@ public class SessionController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.info("Session created successfully");
-         return new ResponseEntity<>(newSession, HttpStatus.OK);
+        return new ResponseEntity<>(newSession, HttpStatus.OK);
     }
 
     @DeleteMapping("/{sessionId}")
@@ -93,5 +93,4 @@ public class SessionController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }

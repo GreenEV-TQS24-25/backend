@@ -5,18 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
-import ua.deti.tqs.entities.Session;
-import ua.deti.tqs.entities.User;
-import ua.deti.tqs.entities.types.Role;
-import ua.deti.tqs.entities.types.SpotState;
 import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
-import ua.deti.tqs.repositories.SessionRepository;
-import ua.deti.tqs.repositories.UserRepository;
 import ua.deti.tqs.services.interfaces.ChargingSpotService;
 
-import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -25,8 +17,6 @@ import java.util.List;
 public class ChargingSpotServiceImpl implements ChargingSpotService {
      private final ChargingSpotRepository chargingSpotRepository;
      private final ChargingStationRepository chargingStationRepository;
-     private final SessionRepository sessionRepository;
-     private final UserRepository userRepository;
 
     @Override
     public List<ChargingSpot> getAllChargingSpotsByStationId(int stationId) {
@@ -120,8 +110,12 @@ public class ChargingSpotServiceImpl implements ChargingSpotService {
 
         if (chargingSpot.getPricePerKwh() != null)
             existingChargingSpot.setPricePerKwh(chargingSpot.getPricePerKwh());
+
         if (chargingSpot.getConnectorType() != null)
             existingChargingSpot.setConnectorType(chargingSpot.getConnectorType());
+
+        if (chargingSpot.getState() != null)
+            existingChargingSpot.setState(chargingSpot.getState());
 
         log.debug("Saving updated charging spot {}", existingChargingSpot);
         return chargingSpotRepository.save(existingChargingSpot);
@@ -144,39 +138,6 @@ public class ChargingSpotServiceImpl implements ChargingSpotService {
 
         chargingSpotRepository.delete(chargingSpot);
         log.debug("Charging spot with id {} deleted successfully", id);
-        return true;
-    }
-
-    @Override
-    public boolean updateChargingSpotStatus(int id, SpotState status, int userId) {
-        log.debug("Updating charging spot status with id {} to {}", id, status);
-        ChargingSpot chargingSpot = chargingSpotRepository.findById(id).orElse(null);
-        User user = userRepository.findById(userId).orElse(null);
-        if (chargingSpot == null || user == null || status == null) {
-            log.debug("Charging spot with id {} or user with id {} not found or status is null", id, userId);
-            return false;
-        }
-
-        List<Session> activeSessions = sessionRepository.findActiveSessionsBySpot(id, Instant.now())
-                .orElse(Collections.emptyList());
-
-        if (!activeSessions.isEmpty()) {
-            Session session = activeSessions.getFirst();
-            if (session.getVehicle().getUser().getId() != userId ||
-                    (session.getVehicle().getUser().getRole() == Role.USER && status == SpotState.OUT_OF_SERVICE)) {
-                log.debug("Charging spot with id {} has active sessions, cannot change status to {}", id, status);
-                return false;
-            }
-        }
-
-        if (chargingSpot.getState() == SpotState.OUT_OF_SERVICE && user.getRole() != Role.OPERATOR) {
-            log.debug("Charging spot with id {} is out of service, only operators can change status", id);
-            return false;
-        }
-
-        chargingSpot.setState(status);
-        log.debug("Saving updated charging spot status {}.", chargingSpot);
-        chargingSpotRepository.save(chargingSpot);
         return true;
     }
 

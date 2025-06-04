@@ -19,36 +19,24 @@ import ua.deti.tqs.entities.ChargingSpot;
 import ua.deti.tqs.entities.ChargingStation;
 import ua.deti.tqs.entities.User;
 import ua.deti.tqs.entities.types.Role;
-import ua.deti.tqs.entities.types.SpotState;
 import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
-import ua.deti.tqs.entities.Vehicle;
-import ua.deti.tqs.entities.Session;
-import ua.deti.tqs.repositories.SessionRepository;
-import ua.deti.tqs.repositories.UserRepository;
-
-import java.util.Collections;
-import static org.mockito.ArgumentMatchers.anyInt;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class ChargingSpotServiceTest {
 
   @Mock private ChargingStationRepository chargingStationRepository;
-  @Mock private ChargingSpotRepository chargingSpotRepository;
-  @Mock private SessionRepository sessionRepository;
-  @Mock private UserRepository userRepository;
 
+  @Mock private ChargingSpotRepository chargingSpotRepository;
 
   @InjectMocks private ChargingSpotServiceImpl chargingSpotService;
 
   private ChargingStation chargingStation1;
-  private ChargingSpot chargingSpot;
-  private User operator1;
 
-  private User regularUser;
-  private Session activeSession;
-  private Vehicle vehicle;
+  private ChargingSpot chargingSpot;
+
+  private User operator1;
 
   @BeforeEach
   void setUp() {
@@ -69,16 +57,6 @@ class ChargingSpotServiceTest {
     chargingSpot.setStation(chargingStation1);
     chargingSpot.setPowerKw(BigDecimal.valueOf(50));
     chargingSpot.setPricePerKwh(BigDecimal.valueOf(0.5));
-
-    regularUser = new User();
-    regularUser.setId(2);
-    regularUser.setRole(Role.USER);
-
-    vehicle = new Vehicle();
-    vehicle.setUser(regularUser);
-
-    activeSession = new Session();
-    activeSession.setVehicle(vehicle);
   }
 
   @Test
@@ -304,130 +282,4 @@ class ChargingSpotServiceTest {
 
     verify(chargingSpotRepository).findById(chargingSpot.getId());
   }
-
-  @Test
-  void whenUpdateChargingSpotStatus_SpotNotFound_thenReturnFalse() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.empty());
-    boolean updated = chargingSpotService.updateChargingSpotStatus(1, SpotState.FREE, 1);
-    assertThat(updated).isFalse();
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_UserNotFound_thenReturnFalse() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
-    boolean updated = chargingSpotService.updateChargingSpotStatus(1, SpotState.FREE, 1);
-    assertThat(updated).isFalse();
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_StatusNull_thenReturnFalse() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(operator1));
-    boolean updated = chargingSpotService.updateChargingSpotStatus(1, null, operator1.getId());
-    assertThat(updated).isFalse();
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_ActiveSessionExistsButUserNotOwner_thenReturnFalse() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(operator1));
-    when(sessionRepository.findActiveSessionsBySpot(anyInt(), any()))
-            .thenReturn(Optional.of(List.of(activeSession)));
-
-    boolean updated = chargingSpotService.updateChargingSpotStatus(
-            chargingSpot.getId(), SpotState.FREE, operator1.getId()
-    );
-    assertThat(updated).isFalse();
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_ActiveSessionUserOwnerButUserRoleUserAndStatusOutOfService_thenReturnFalse() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(regularUser));
-    when(sessionRepository.findActiveSessionsBySpot(anyInt(), any()))
-            .thenReturn(Optional.of(List.of(activeSession)));
-
-    boolean updated = chargingSpotService.updateChargingSpotStatus(
-            chargingSpot.getId(), SpotState.OUT_OF_SERVICE, regularUser.getId()
-    );
-    assertThat(updated).isFalse();
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_ActiveSessionUserOwnerAndOperatorStatusOutOfService_thenReturnTrue() {
-    vehicle.setUser(operator1);
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(operator1));
-    when(sessionRepository.findActiveSessionsBySpot(anyInt(), any()))
-            .thenReturn(Optional.of(List.of(activeSession)));
-
-    boolean updated = chargingSpotService.updateChargingSpotStatus(
-            chargingSpot.getId(), SpotState.OUT_OF_SERVICE, operator1.getId()
-    );
-    assertThat(updated).isTrue();
-    assertThat(chargingSpot.getState()).isEqualTo(SpotState.OUT_OF_SERVICE);
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_ActiveSessionUserOwnerAndStatusNotOutOfService_thenReturnTrue() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(regularUser));
-    when(sessionRepository.findActiveSessionsBySpot(anyInt(), any()))
-            .thenReturn(Optional.of(List.of(activeSession)));
-
-    boolean updated = chargingSpotService.updateChargingSpotStatus(
-            chargingSpot.getId(), SpotState.OCCUPIED, regularUser.getId()
-    );
-    assertThat(updated).isTrue();
-    assertThat(chargingSpot.getState()).isEqualTo(SpotState.OCCUPIED);
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_NoActiveSession_thenReturnTrue() {
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(operator1));
-    when(sessionRepository.findActiveSessionsBySpot(anyInt(), any()))
-            .thenReturn(Optional.of(Collections.emptyList()));
-
-    boolean updated = chargingSpotService.updateChargingSpotStatus(
-            chargingSpot.getId(), SpotState.FREE, operator1.getId()
-    );
-    assertThat(updated).isTrue();
-    assertThat(chargingSpot.getState()).isEqualTo(SpotState.FREE);
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_OutOfServiceAdmin_thenReturnTrue() {
-    chargingSpot.setState(SpotState.OUT_OF_SERVICE);
-    when(chargingSpotRepository.findById(anyInt())).thenReturn(Optional.of(chargingSpot));
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(operator1));
-    when(sessionRepository.findActiveSessionsBySpot(anyInt(), any()))
-            .thenReturn(Optional.of(Collections.emptyList()));
-
-    boolean updated = chargingSpotService.updateChargingSpotStatus(
-            chargingSpot.getId(), SpotState.FREE, operator1.getId()
-    );
-    assertThat(updated).isTrue();
-    assertThat(chargingSpot.getState()).isEqualTo(SpotState.FREE);
-  }
-
-    @Test
-    void whenUpdateChargingSpotStatus_OutOfServiceAndUserNotOperator_thenReturnFalse() {
-      chargingSpot.setState(SpotState.OUT_OF_SERVICE);
-      when(chargingSpotRepository.findById(anyInt())).
-              thenReturn(Optional.of(chargingSpot));
-
-      when(userRepository.findById(anyInt())).
-              thenReturn(Optional.of(regularUser));
-      when(sessionRepository.findActiveSessionsBySpot(anyInt(), any())).
-              thenReturn(Optional.of(Collections.emptyList()));
-      boolean updated = chargingSpotService.updateChargingSpotStatus(
-              chargingSpot.getId(), SpotState.OUT_OF_SERVICE, regularUser.getId()
-      );
-
-      assertThat(updated).isFalse();
-      assertThat(chargingSpot.getState()).isEqualTo(SpotState.OUT_OF_SERVICE);
-    }
-
 }

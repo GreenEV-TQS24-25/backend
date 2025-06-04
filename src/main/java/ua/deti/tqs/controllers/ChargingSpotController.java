@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.deti.tqs.entities.ChargingSpot;
-import ua.deti.tqs.entities.types.SpotState;
 import ua.deti.tqs.services.interfaces.ChargingSpotService;
 import ua.deti.tqs.utils.Constants;
 
@@ -99,24 +98,6 @@ public class ChargingSpotController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.info("ChargingSpot deleted successfully with id {} and operator id {}", id, operatorId);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PutMapping(PRIV_BASE_PATH + "/status/{id}")
-    @Operation(summary = "Update Charging Spot Status", description = "Updates the status of a charging spot.")
-    @ApiResponse(responseCode = "200", description = "Charging spot status updated successfully")
-    @ApiResponse(responseCode = "404", description = "Charging spot not found")
-    public ResponseEntity<Void> updateChargingSpotStatus(@PathVariable("id") int id, @RequestParam("status") String status) {
-        log.info("Updating charging spot status with id {} to {}", id, status);
-        int userId = getAuthenticatedUserId();
-        boolean updated = chargingSpotService.updateChargingSpotStatus(id, SpotState.valueOf(status.toUpperCase()), userId);
-
-
-        if (!updated) {
-            log.warn("Charging spot with id {} not found or status update failed", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        log.info("Charging spot status updated successfully for id {}", id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

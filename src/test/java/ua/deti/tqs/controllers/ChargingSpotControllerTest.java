@@ -235,46 +235,4 @@ class ChargingSpotControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
-
-  @Test
-  void whenUpdateChargingSpotStatus_withValidStatusByOperator_thenReturnOk() throws Exception {
-
-    securityUtils.when(SecurityUtils::getAuthenticatedUserId).thenReturn(testOperator.getId());
-    Mockito.when(chargingSpotService.updateChargingSpotStatus(
-            testSpot.getId(),
-            SpotState.OUT_OF_SERVICE,
-            testOperator.getId()
-    )).thenReturn(true);
-
-    mockMvc.perform(
-            put("/" + Constants.API_V1 + "private/charging-spots/status/" + testSpot.getId())
-                    .param("status", "OUT_OF_SERVICE")
-                    .contentType(MediaType.APPLICATION_JSON)
-    ).andExpect(status().isOk());
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_withInvalidStatus_thenReturnBadRequest() throws Exception {
-    mockMvc.perform(
-            put("/" + Constants.API_V1 + "private/charging-spots/status/" + testSpot.getId())
-                    .param("status", "OUT_OF_SERVICE")
-                    .contentType(MediaType.APPLICATION_JSON)
-    ).andExpect(status().isNotFound());
-  }
-
-  @Test
-  void whenUpdateChargingSpotStatus_SpotNotFound_thenReturnNotFound() throws Exception {
-    Mockito.when(chargingSpotService.updateChargingSpotStatus(
-            testSpot.getId(),
-            SpotState.OCCUPIED,
-            testOperator.getId()
-    )).thenReturn(false);
-
-    mockMvc.perform(
-            put("/" + Constants.API_V1 + "private/charging-spots/status/" + testSpot.getId())
-                    .param("status", "OCCUPIED")
-                    .contentType(MediaType.APPLICATION_JSON)
-    ).andExpect(status().isNotFound());
-  }
-
 }
