@@ -23,15 +23,15 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ChargingSpotServiceImpl implements ChargingSpotService {
-     private final ChargingSpotRepository chargingSpotRepository;
-     private final ChargingStationRepository chargingStationRepository;
-     private final SessionRepository sessionRepository;
-     private final UserRepository userRepository;
+    private final ChargingSpotRepository chargingSpotRepository;
+    private final ChargingStationRepository chargingStationRepository;
+    private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<ChargingSpot> getAllChargingSpotsByStationId(int stationId) {
         log.debug("Fetching all charging spots with station id {}", stationId);
-        List<ChargingSpot>  chargingSpots = chargingSpotRepository
+        List<ChargingSpot> chargingSpots = chargingSpotRepository
                 .findAllByStation_Id(stationId)
                 .orElse(null);
 
@@ -157,8 +157,19 @@ public class ChargingSpotServiceImpl implements ChargingSpotService {
             return false;
         }
 
-        List<Session> activeSessions = sessionRepository.findActiveSessionsBySpot(id, Instant.now())
+        // Get current time once for consistency
+        Instant now = Instant.now();
+
+        // Get all sessions for this spot and filter active ones in memory
+        List<Session> allSessions = sessionRepository.findAllByChargingSpot_Id(id)
                 .orElse(Collections.emptyList());
+
+        List<Session> activeSessions = allSessions.stream()
+                .filter(session -> {
+                    Instant endTime = session.getStartTime().plusSeconds(session.getDuration());
+                    return !session.getStartTime().isAfter(now) && !endTime.isBefore(now);
+                })
+                .toList();
 
         if (!activeSessions.isEmpty()) {
             Session session = activeSessions.getFirst();
@@ -179,7 +190,4 @@ public class ChargingSpotServiceImpl implements ChargingSpotService {
         chargingSpotRepository.save(chargingSpot);
         return true;
     }
-
 }
-
-
