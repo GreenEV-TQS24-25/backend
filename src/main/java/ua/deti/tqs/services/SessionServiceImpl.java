@@ -100,6 +100,14 @@ public class SessionServiceImpl implements SessionService {
       return null;
     }
 
+    if (chargingSpot.getConnectorType() != vehicle.getConnectorType()) {
+      log.debug(
+          "Invalid session charging spot, charging spot with id {} does not match vehicle connector type {}",
+          chargingSpot.getId(),
+          vehicle.getConnectorType());
+      return null;
+    }
+
     List<Session> sessions =
         sessionRepository.findAllByChargingSpot_Id(chargingSpot.getId()).orElse(null);
     if (sessions != null) {

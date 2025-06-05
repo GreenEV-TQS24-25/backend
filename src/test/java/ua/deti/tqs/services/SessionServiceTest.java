@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import ua.deti.tqs.entities.*;
+import ua.deti.tqs.entities.types.ConnectorType;
 import ua.deti.tqs.entities.types.Role;
 import ua.deti.tqs.repositories.ChargingSpotRepository;
 import ua.deti.tqs.repositories.ChargingStationRepository;
@@ -240,6 +241,19 @@ class SessionServiceTest {
         Session created = sessionService.createSession(user.getId(), session);
 
         assertThat(created).isNotNull();
+    }
+
+    @Test
+    void whenCreateSession_withInvalidConnector_Null() {
+        session.setStartTime(Instant.now().minusSeconds(3600));
+        vehicle.setConnectorType(ConnectorType.MENNEKES);
+
+        when(vehicleRepository.findById(session.getVehicle().getId())).thenReturn(Optional.of(vehicle));
+        when(chargingSpotRepository.findById(session.getChargingSpot().getId())).thenReturn(Optional.of(chargingSpot));
+
+        Session created = sessionService.createSession(user.getId(), session);
+
+        assertThat(created).isNull();
     }
 
     @Test
