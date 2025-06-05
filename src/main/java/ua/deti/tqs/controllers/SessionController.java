@@ -45,16 +45,11 @@ public class SessionController {
     @GetMapping("/station/{stationId}")
     @Operation(summary = "Get all Sessions by Station ID", description = "Fetches a list of all sessions by station id.")
     @ApiResponse(responseCode = "200", description = "List of sessions retrieved successfully")
-    @ApiResponse(responseCode = "404", description = "No sessions found")
     public ResponseEntity<List<Session>> getAllSessionsByStationId(@PathVariable("stationId") int stationId) {
         log.info("Fetching all sessions with station id {}", stationId);
 
         List<Session> sessions = sessionService.getAllSessionsByStationId(stationId);
 
-        if (sessions.isEmpty()) {
-            log.warn("No sessions found with station id {}", stationId);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         log.info("Sessions retrieved successfully for station id {}", stationId);
         return new ResponseEntity<>(sessions, HttpStatus.OK);
     }
