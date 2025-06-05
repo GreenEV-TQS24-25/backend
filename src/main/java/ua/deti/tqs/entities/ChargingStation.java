@@ -15,7 +15,7 @@ import lombok.Setter;
 public class ChargingStation {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
+  @Column(name = "id", nullable = false, unique = true)
   private Integer id;
 
   @Size(max = 100)
