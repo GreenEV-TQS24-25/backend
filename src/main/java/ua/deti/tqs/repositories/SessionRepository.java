@@ -9,7 +9,6 @@ import java.util.Optional;
 public interface SessionRepository extends JpaRepository<Session, Integer> {
     Optional<List<Session>> findAllByVehicle_User_Id(Integer userId);
     Optional<List<Session>> findAllByChargingSpot_Station_Id(Integer stationId);
-
     Optional<List<Session>> findAllByChargingSpot_Id(Integer chargingSpotId);
 
 }

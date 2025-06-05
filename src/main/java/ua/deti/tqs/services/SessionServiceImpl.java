@@ -118,6 +118,15 @@ public class SessionServiceImpl implements SessionService {
 
     int errorCount = 0;
 
+        if (session.getStartTime() == null) {
+            log.debug("Invalid session start time, start time is null");
+            errorCount++;
+        }
+
+        if (session.getDuration() <= 0) {
+            log.debug("Invalid session duration, duration is less than or equal to 0");
+            errorCount++;
+        }
     if (session.getStartTime() == null) {
       log.debug("Invalid session start time, start time is null");
       errorCount++;

@@ -1,6 +1,7 @@
 package ua.deti.tqs.services.interfaces;
 
 import ua.deti.tqs.entities.ChargingSpot;
+import ua.deti.tqs.entities.types.SpotState;
 
 import java.util.List;
 
@@ -12,4 +13,6 @@ public interface ChargingSpotService {
     ChargingSpot updateChargingSpot(int operatorId, ChargingSpot chargingSpot);
 
     boolean deleteChargingSpot(int id, int operatorId);
+
+    boolean updateChargingSpotStatus(int id, SpotState status, int userId);
 }
