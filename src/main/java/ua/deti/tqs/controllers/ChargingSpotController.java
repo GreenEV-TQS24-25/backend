@@ -119,3 +119,4 @@ public class ChargingSpotController {
         return new ResponseEntity<>(true,HttpStatus.OK);
     }
 }
+

@@ -27,7 +27,7 @@ CREATE TABLE vehicle
 CREATE TABLE charging_station
 (
     id          SERIAL PRIMARY KEY,
-    name        VARCHAR(100)  NOT NULL,
+    name        VARCHAR(100)  NOT NULL UNIQUE,
     lat         DECIMAL(9, 6) NOT NULL,
     lon         DECIMAL(9, 6) NOT NULL,
     operator_id INTEGER REFERENCES user_table (id) ON DELETE CASCADE NOT NULL,
