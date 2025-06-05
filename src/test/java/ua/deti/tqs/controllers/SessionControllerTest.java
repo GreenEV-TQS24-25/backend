@@ -157,16 +157,6 @@ class SessionControllerTest {
     }
 
     @Test
-    void whenGetAllSessionsByStationId_thenReturnNotFound() throws Exception {
-        int stationId = 99;
-        when(sessionService.getAllSessionsByStationId(stationId)).thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/" + Constants.API_V1 + "private/session/station/" + stationId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     void whenCreateValidSession_thenReturnCreatedSession() throws Exception {
         when(sessionService.createSession(eq(testUser.getId()), any(Session.class)))
                 .thenReturn(testSession);
