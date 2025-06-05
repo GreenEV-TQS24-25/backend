@@ -76,16 +76,16 @@ public class SessionController {
     @Operation(summary = "Delete a Session", description = "Deletes a session.")
     @ApiResponse(responseCode = "200", description = "Session deleted successfully")
     @ApiResponse(responseCode = "404", description = "No session found")
-    public ResponseEntity<Void> deleteSession(@PathVariable("sessionId") int sessionId) {
+    public ResponseEntity<Boolean> deleteSession(@PathVariable("sessionId") int sessionId) {
         log.info("Deleting session with id {}", sessionId);
         int userId = getAuthenticatedUser().getId();
 
         if (sessionService.deleteSession(userId, sessionId)) {
             log.info("Session deleted successfully");
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(true,HttpStatus.OK);
         } else {
             log.warn("No session found with id {}", sessionId);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
         }
     }
 
