@@ -106,17 +106,17 @@ public class ChargingSpotController {
     @Operation(summary = "Update Charging Spot Status", description = "Updates the status of a charging spot.")
     @ApiResponse(responseCode = "200", description = "Charging spot status updated successfully")
     @ApiResponse(responseCode = "404", description = "Charging spot not found")
-    public ResponseEntity<Void> updateChargingSpotStatus(@PathVariable("id") int id, @RequestParam("status") String status) {
+    public ResponseEntity<Boolean> updateChargingSpotStatus(@PathVariable("id") int id, @RequestParam("status") String status) {
         log.info("Updating charging spot status with id {} to {}", id, status);
         int userId = getAuthenticatedUserId();
         boolean updated = chargingSpotService.updateChargingSpotStatus(id, SpotState.valueOf(status.toUpperCase()), userId);
 
-
         if (!updated) {
             log.warn("Charging spot with id {} not found or status update failed", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(false,HttpStatus.NOT_FOUND);
         }
         log.info("Charging spot status updated successfully for id {}", id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(true,HttpStatus.OK);
     }
 }
+
