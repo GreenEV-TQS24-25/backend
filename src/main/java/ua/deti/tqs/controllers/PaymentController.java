@@ -2,6 +2,9 @@ package ua.deti.tqs.controllers;
 
 import static ua.deti.tqs.utils.SecurityUtils.getAuthenticatedUser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -54,10 +57,10 @@ public class PaymentController {
       if (session == null || session.getVehicle().getUser().getId() != userId) {
         return ResponseEntity.notFound().build();
       }
-
-      if (session.getPaymentStatus() != PaymentState.PENDING) {
-        return ResponseEntity.badRequest().build();
-      }
+      //
+      //      if (session.getPaymentStatus() != PaymentState.PENDING) {
+      //        return ResponseEntity.badRequest().build();
+      //      }
 
       PaymentIntent paymentIntent = paymentService.createPaymentIntent(session);
       if (paymentIntent == null) {
@@ -85,32 +88,47 @@ public class PaymentController {
 
       switch (event.getType()) {
         case "payment_intent.succeeded":
+          log.info("Payment succeeded for event: {}", event.getId());
           handlePaymentSucceeded(event);
           break;
         case "payment_intent.payment_failed":
           // Handle payment failure
-          // TODO
           log.warn("Payment failed for event: {}", event.getId());
           // handlePaymentFailed(event);
           break;
+        case "payment_intent.canceled":
+          // Handle payment cancellation
+          log.warn("Payment canceled for event: {}", event.getId());
+          // handlePaymentCanceled(event);
+          break;
+        case "payment_intent.processing":
+
         default:
           log.info("Unhandled event type: {}", event.getType());
       }
 
       return ResponseEntity.ok("Success");
 
-    } catch (SignatureVerificationException e) {
+    } catch (SignatureVerificationException | JsonProcessingException e) {
       log.error("Invalid signature: {}", e.getMessage());
       return ResponseEntity.badRequest().body("Invalid signature");
     }
   }
 
-  private void handlePaymentSucceeded(Event event) {
-    PaymentIntent paymentIntent =
-        (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-    //    Integer userId = getAuthenticatedUser().getId();
-    if (paymentIntent != null) {
-      String sessionId = paymentIntent.getMetadata().get("session_id");
+  private void handlePaymentSucceeded(Event event) throws JsonProcessingException {
+    String eventString = event.toJson();
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    Map<String, Object> map =
+        objectMapper.readValue(eventString, new TypeReference<Map<String, Object>>() {});
+    if (map != null) {
+      Map<String, String> metadata =
+          (Map<String, String>)
+              ((Map<String, Object>) ((Map<String, Object>) map.get("data")).get("object"))
+                  .get("metadata");
+
+      String sessionId = metadata.get("session_id");
+      log.info("Payment succeeded for session: {}", sessionId);
       if (sessionId != null) {
         Session session = sessionService.getSessionById(Integer.parseInt(sessionId));
 
