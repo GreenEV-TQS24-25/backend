@@ -122,6 +122,7 @@ public class PaymentController {
     Map<String, Object> map =
         objectMapper.readValue(eventString, new TypeReference<Map<String, Object>>() {});
     if (map != null) {
+      // SEE ME LATER
       Map<String, String> metadata =
           (Map<String, String>)
               ((Map<String, Object>) ((Map<String, Object>) map.get("data")).get("object"))
