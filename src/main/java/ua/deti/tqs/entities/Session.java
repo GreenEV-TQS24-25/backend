@@ -46,7 +46,7 @@ public class Session {
   @Column(name = "total_cost", precision = 8, scale = 2)
   private BigDecimal totalCost;
 
-  @Column(name = "payment_intent_id")
+  @Column(name = "payment_id")
   private String paymentIntentId;
 
   @Column(name = "payment_status")
