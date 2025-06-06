@@ -49,7 +49,7 @@ public class Session {
   @Column(name = "payment_id")
   private String paymentIntentId;
 
-  @Column(name = "payment_status")
+  @Column(name = "payment_state")
   @Enumerated(EnumType.STRING)
   private PaymentState paymentStatus = PaymentState.PENDING;
 
