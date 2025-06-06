@@ -1,5 +1,14 @@
 package ua.deti.tqs.services;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,16 +24,6 @@ import ua.deti.tqs.repositories.ChargingStationRepository;
 import ua.deti.tqs.repositories.SessionRepository;
 import ua.deti.tqs.repositories.VehicleRepository;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
-
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class SessionServiceTest {
@@ -37,6 +36,9 @@ class SessionServiceTest {
     private ChargingStationRepository chargingStationRepository;
     @Mock
     private VehicleRepository vehicleRepository;
+
+    @Mock
+    private PaymentServiceImpl paymentService;
 
     @InjectMocks
     private SessionServiceImpl sessionService;
