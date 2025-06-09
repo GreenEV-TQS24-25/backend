@@ -236,14 +236,7 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <test>ua.deti.tqs.functional.CucumberTest</test>
-                </configuration>
-            </plugin>
+
 
             <plugin>
                 <groupId>app.getxray</groupId>
