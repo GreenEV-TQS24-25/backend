@@ -16,7 +16,7 @@ public class BaseStepDefinitions {
         // make it headless
     
         FirefoxOptions options = new FirefoxOptions();
-        options.setHeadless(true);
+        options.addArguments("-headless");
         driver = new FirefoxDriver(options);
         js = (JavascriptExecutor) driver;
     }
