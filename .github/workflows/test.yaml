@@ -5,7 +5,7 @@ on:
     branches:
       - main
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 jobs:
@@ -44,6 +44,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          rm -drf src/test/resources/ua src/test/java/ua/deti/tqs/functional
           mvn -B verify failsafe:integration-test sonar:sonar \
           -Dsonar.projectKey=GreenEV-TQS24-25_backend
 
