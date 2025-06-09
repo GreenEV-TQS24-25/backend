@@ -47,7 +47,7 @@ jobs:
           sudo apt install firefox -y --allow-downgrades
 
       - name: Up containers
-        run: docker compose -f compose.prod.yaml up -d --build
+        run: docker compose -f compose.yaml up -d --build
 
       - name: Build and test using Selenium
         run: |
@@ -56,5 +56,5 @@ jobs:
 
       - name: Down containers
         run: |
-          docker compose -f compose.prod.yaml down --volumes
+          docker compose -f compose.yaml down --volumes
           docker builder prune -a -f
