@@ -10,7 +10,7 @@ import org.openqa.selenium.interactions.Actions;
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.*;
 
-public class AdminStepDefinitions {
+public class AdminSteps {
 
     @Given("I am on the login page")
     public void i_am_on_login_page() {

@@ -7,7 +7,7 @@ import org.openqa.selenium.By;
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.*;
 
-public class AuthenticationStepDefinitions {
+public class AuthenticationSteps {
 
     @When("I enter credentials {string} and {string}")
     public void enter_credentials(String email, String password) {

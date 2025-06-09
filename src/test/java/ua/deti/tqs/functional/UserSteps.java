@@ -8,7 +8,7 @@ import org.openqa.selenium.Dimension;
 
 import static org.junit.Assert.assertTrue;
 
-public class UserStepDefinitions {
+public class UserSteps {
 
     @Given("I am on the user login page")
     public void i_am_on_user_login_page() {

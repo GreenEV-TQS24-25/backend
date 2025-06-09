@@ -4,6 +4,7 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.JavascriptExecutor;
 
 public class BaseStepDefinitions {
@@ -12,7 +13,11 @@ public class BaseStepDefinitions {
 
     @Before
     public void setUp() {
-        driver = new FirefoxDriver();
+        // make it headless
+    
+        FirefoxOptions options = new FirefoxOptions();
+        options.setHeadless(true);
+        driver = new FirefoxDriver(options);
         js = (JavascriptExecutor) driver;
     }
 
