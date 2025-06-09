@@ -1,0 +1,60 @@
+name: Frontend tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and test frontend
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          repository: GreenEV-TQS24-25/control-room
+          token: ${{ secrets.PRIVATE_TOKEN }}
+          submodules: recursive
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: "zulu"
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: "${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}"
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Install Firefox
+        run: |
+          sudo snap remove firefox
+          wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+          echo '
+          Package: *
+          Pin: origin packages.mozilla.org
+          Pin-Priority: 1000
+          ' | sudo tee /etc/apt/preferences.d/mozilla
+          sudo apt update
+          sudo apt install firefox -y --allow-downgrades
+
+      - name: Up containers
+        run: docker compose -f compose.prod.yaml up -d --build
+
+      - name: Build and test using Selenium
+        run: |
+          cd backend
+          mvn -B '-Dtest=ua.deti.tqs.functional.AuthenticationStepDefinitions' test
+
+      - name: Down containers
+        run: |
+          docker compose -f compose.prod.yaml down --volumes
+          docker builder prune -a -f
