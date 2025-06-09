@@ -1,4 +1,3 @@
-// AuthenticationStepDefinitions.java
 package ua.deti.tqs.functional;
 
 import io.cucumber.java.en.Then;

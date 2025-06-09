@@ -52,7 +52,7 @@ jobs:
       - name: Build and test using Selenium
         run: |
           cd backend
-          mvn -B '-Dtest=ua.deti.tqs.functional.AuthenticationStepDefinitions' test
+           mvn clean -Dcucumber.features="src/test/resources/ua/deti/tqs/functional/auth.feature" test
 
       - name: Down containers
         run: |
